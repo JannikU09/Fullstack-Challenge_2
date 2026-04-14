@@ -1,0 +1,31 @@
+{
+  "name": "fullstack-challenge",
+  "private": true,
+  "packageManager": "pnpm@10.30.2",
+  "scripts": {
+    "db:start": "docker compose up -d",
+    "db:stop": "docker compose down",
+    "setup": "test -f packages/database/.env || cp packages/database/.env.example packages/database/.env && test -f packages/web/.env || cp packages/web/.env.example packages/web/.env && pnpm install && pnpm run db:start && pnpm --filter @repo/database db:push && pnpm --filter @repo/database seed",
+    "dev": "pnpm --filter @repo/web dev",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "@scarf/scarf",
+      "@tree-sitter-grammars/tree-sitter-yaml",
+      "core-js-pure",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "tree-sitter",
+      "tree-sitter-json"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.11"
+  }
+}
