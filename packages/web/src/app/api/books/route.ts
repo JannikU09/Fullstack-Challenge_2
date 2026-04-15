@@ -1,0 +1,30 @@
+import { db, books, authors } from "@repo/database";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+    try {
+        const allBooks = await db.select().from(books).innerJoin(authors, eq(books.authorId, authors.id));
+        return NextResponse.json(allBooks, { statusText: "Liste der Bücher" });
+    } catch {
+        return NextResponse.json({ error: "Failed to fetch books" }, { status: 500 });
+    }
+};
+
+export async function POST(request: Request) {
+    try {
+        const body = await request.json();
+        const { title, authorId, isbn, year } = body;
+
+        const newBook = await db.insert(books).values({
+            title,
+            authorId,
+            isbn,
+            year,
+        });
+
+        return NextResponse.json(newBook, { status: 201 });
+    } catch {
+        return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
+    }
+};
