@@ -7,10 +7,23 @@ settings:
 importers:
 
   .:
+    dependencies:
+      drizzle-orm:
+        specifier: 0.44.2
+        version: 0.44.2(@electric-sql/pglite@0.4.1)(@prisma/client@7.7.0(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))(typescript@6.0.2))(@types/pg@8.15.4)(mysql2@3.15.3)(pg@8.16.0)(postgres@3.4.7)(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))
+      pg:
+        specifier: 8.16.0
+        version: 8.16.0
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.11
         version: 2.4.11
+      '@types/pg':
+        specifier: 8.15.4
+        version: 8.15.4
+      drizzle-kit:
+        specifier: 0.31.1
+        version: 0.31.1
 
   packages/database:
     dependencies:
