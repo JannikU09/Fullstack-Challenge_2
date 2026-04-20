@@ -16,15 +16,18 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { title, authorId, isbn, year } = body;
 
-        const newBook = await db.insert(books).values({
+        const [newBook] = await db.insert(books).values({
             title,
             authorId,
             isbn,
             year,
-        });
+        }).returning();
 
-        return NextResponse.json(newBook, { status: 201 });
-    } catch {
-        return NextResponse.json({ error: "Ungültige Eingabe" }, { status: 400 });
+        const [newBookWithAuthor] = await db.select().from(books).innerJoin(authors, eq(books.authorId, authors.id)).where(eq(books.id, newBook.id));
+
+        return NextResponse.json(newBookWithAuthor, { status: 201 });
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ error: "Author oder Title fehlen" }, { status: 400 });
     }
 };
