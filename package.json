@@ -28,7 +28,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
     "@types/pg": "8.15.4",
-    "drizzle-kit": "0.31.1"
+    "drizzle-kit": "0.31.1",
+    "typescript": "6.0.2"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -36,6 +36,9 @@ importers:
       drizzle-kit:
         specifier: 0.31.1
         version: 0.31.1
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
 
   packages/database:
     dependencies:
