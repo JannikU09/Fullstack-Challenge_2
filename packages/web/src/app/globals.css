@@ -132,6 +132,9 @@ button {
   font-size: 1rem;
   font-family: inherit;
   cursor: pointer;
+  width: 100px;
+  margin-right: 5px;
+  margin-bottom: 10px;
 }
 
 button.primary {
