@@ -1,0 +1,46 @@
+.books {
+  width: 75%;
+  margin-right: 20px;
+}
+
+.book {
+  background-color: lightcyan;
+  box-shadow: 5px 5px 5px lightgray;
+  margin-bottom: 7.5px;
+}
+
+.formField {
+  width: 25%;
+  position: relative;
+}
+
+.updateFormField {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.updateForm {
+  width: 100%;
+}
+
+.editButton {
+  background-color: darkblue;
+  color: white;
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+
+.deleteButton {
+  background-color: red;
+  color: white;
+}
+
+.addButton {
+  background-color: green;
+  color: white;
+}
+
+p {
+  margin-bottom: 0;
+}
