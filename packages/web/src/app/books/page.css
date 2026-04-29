@@ -9,36 +9,14 @@
   margin-bottom: 7.5px;
 }
 
-.formField {
-  width: 25%;
-  position: relative;
+.updateForm {
+  width: 100%;
 }
 
 .updateFormField {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-}
-
-.updateForm {
-  width: 100%;
-}
-
-.editButton {
-  background-color: darkblue;
-  color: white;
-  margin-right: 5px;
-  margin-bottom: 10px;
-}
-
-.deleteButton {
-  background-color: red;
-  color: white;
-}
-
-.addButton {
-  background-color: green;
-  color: white;
 }
 
 p {
