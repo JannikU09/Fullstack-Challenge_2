@@ -2,6 +2,18 @@ import { books, db } from "@repo/database";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 
+export async function GET(_req: NextRequest, ctx: RouteContext<"/api/books/[id]">) {
+  try {
+    const { id } = await ctx.params;
+    const bookId = Number(id);
+
+    const getBook = await db.select().from(books).where(eq(books.id, bookId));
+    return NextResponse.json(getBook, { statusText: "Gesuchtes Buch" });
+  } catch {
+    return NextResponse.json({ error: "Buch nicht gefunden" }, { status: 404 });
+  }
+}
+
 export async function DELETE(_req: NextRequest, ctx: RouteContext<"/api/books/[id]">) {
   try {
     const { id } = await ctx.params;
