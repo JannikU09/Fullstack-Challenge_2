@@ -62,7 +62,7 @@ export default function BooksPage() {
         title: data.Books.title,
         authorId: data.Books.authorId,
         isbn: data.Books.isbn,
-        year: data.Books.year,
+        year: Number(data.Books.year),
       }),
     });
     console.log(event, data);
