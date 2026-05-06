@@ -1,13 +1,23 @@
 import { authors, books, db } from "@repo/database";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import * as z from "zod";
 
-interface RequestBody {
-  title: string;
-  authorId: string;
-  isbn?: string;
-  year?: number;
-}
+// interface RequestBody {
+//   title: string;
+//   authorId: number;
+//   isbn?: string;
+//   year?: number;
+// }
+
+const schema = z.object({
+  title: z.string().min(1),
+  authorId: z.number().int().positive(),
+  isbn: z.string().optional().nullish(),
+  year: z.number().int().optional().nullable(),
+});
+
+type Body = z.infer<typeof schema>;
 
 export async function GET() {
   try {
@@ -24,23 +34,29 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body: RequestBody = await request.json();
+    const body: Body = await request.json();
     const { title, authorId, isbn, year } = body;
 
-    const [newBook] = await db
-      .insert(books)
-      .values({
-        title,
-        authorId,
-        isbn,
-        year,
-      })
-      .returning();
+    const data: Body = {
+      title,
+      authorId,
+      isbn,
+      year,
+    };
+
+    const result = schema.safeParse(data, { reportInput: true });
+    console.log(schema.safeParse(data));
+
+    if (!result.success) {
+      return NextResponse.json({ error: "Validation Error" }, { status: 400 });
+    }
+
+    const [newBook] = await db.insert(books).values(result.data).returning();
 
     const [newBookWithAuthor] = await db
       .select()
       .from(books)
-      .innerJoin(authors, eq(books.authorId, authors.id))
+      .innerJoin(authors, eq(books.authorId, authorId))
       .where(eq(books.id, newBook.id));
 
     return NextResponse.json(newBookWithAuthor, { status: 201 });
