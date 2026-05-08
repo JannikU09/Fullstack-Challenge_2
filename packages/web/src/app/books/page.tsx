@@ -28,10 +28,6 @@ interface Author {
 export default function BooksPage() {
   const [allBooks, setAllBooks] = useState<BookWithAuthor[]>([]);
   const [allAuthors, setAllAuthors] = useState<Author[]>([]);
-  const [title, setTitle] = useState("");
-  const [authorId, setAuthorId] = useState("");
-  const [isbn, setIsbn] = useState("");
-  const [year, setYear] = useState<number | string>("");
   const [openEditor, setOpenEditor] = useState(false);
 
   // Bücher laden
@@ -56,6 +52,7 @@ export default function BooksPage() {
 
   // Neues Buch hinzufügen
   async function createBook(event, data: BookWithAuthor) {
+    console.log(event, data);
     const res = await fetch("/api/books", {
       method: "POST",
       body: JSON.stringify({
@@ -65,35 +62,37 @@ export default function BooksPage() {
         year: Number(data.Books.year),
       }),
     });
-    console.log(event, data);
-    // const res = await fetch('api/books');
-    // const data: BookWithAuthor[] = await res.json();
     const newBook: BookWithAuthor = await res.json();
     console.log("newBook", newBook);
     setAllBooks([newBook, ...allBooks].sort((a, b) => a.Author.id - b.Author.id));
   }
 
-  async function updateBook(bookId: number) {
-    const _res = await fetch(`api/books/${bookId}`, {
+  // Bestehendes Buch bearbeiten
+  async function updateBook(event, book: BookWithAuthor) {
+    console.log(event, book);
+
+    const _res = await fetch(`api/books/${book.Books.id}`, {
       method: "PUT",
       body: JSON.stringify({
-        title: title,
-        authorId: authorId,
-        isbn: isbn || null,
-        year: year || null,
+        title: book.Books.title,
+        authorId: book.Books.authorId,
+        isbn: book.Books.isbn,
+        year: Number(book.Books.year),
       }),
     });
-    // console.log(res);
-    const res2 = await fetch("api/books");
-    const data: BookWithAuthor[] = await res2.json();
-    // console.log("updateBook ", data);
-    setAllBooks(data);
 
-    setTitle("");
-    setAuthorId("");
-    setIsbn("");
-    setYear("");
+    console.log(_res, book);
+
+    console.log("updateBook", event, book);
+    const res = await fetch("api/books");
+    const updatedBook: BookWithAuthor[] = await res.json();
+    setAllBooks(updatedBook);
     setOpenEditor(false);
+  }
+
+  function handleOnSubmit(event, book) {
+    updateBook(event, book);
+    console.log(book);
   }
 
   // Einzelne Bücher löschen
@@ -168,13 +167,14 @@ export default function BooksPage() {
                       <div className="updateFormField">
                         <BookForm
                           initialValues={{
+                            id: book.Books.id,
                             title: book.Books.title,
                             authorId: book.Books.authorId,
-                            isbn: book.Books.isbn || "",
-                            year: book.Books.year || "",
+                            isbn: book.Books.isbn,
+                            year: book.Books.year,
                           }}
                           authors={allAuthors}
-                          onSubmit={() => updateBook(book.Books.id)}
+                          onSubmit={handleOnSubmit}
                           submitLabel="Update"
                         />
                       </div>
