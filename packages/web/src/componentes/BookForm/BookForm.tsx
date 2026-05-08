@@ -6,6 +6,7 @@ import { Button } from "@/componentes/ui/Button";
 import type { BookWithAuthor } from "../../app/books/page";
 
 interface BookInitialValues {
+  id?: number;
   title?: string;
   authorId?: number;
   isbn?: string;
@@ -30,8 +31,8 @@ export function BookForm({
 }: BookFormProps) {
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [authorId, setAuthorId] = useState(initialValues?.authorId ?? "");
-  const [isbn, setIsbn] = useState(initialValues?.isbn);
-  const [year, setYear] = useState(initialValues?.year);
+  const [isbn, setIsbn] = useState(initialValues?.isbn ?? "");
+  const [year, setYear] = useState(initialValues?.year ?? "");
 
   return (
     <div>
@@ -86,16 +87,17 @@ export function BookForm({
               e,
               {
                 Books: {
+                  id: initialValues?.id,
                   title: title,
                   authorId: authorId,
                   isbn: isbn,
                   year: year,
                 },
               },
-              // setTitle(""),
-              // setAuthorId(""),
-              // setIsbn(""),
-              // setYear(""),
+              setTitle(""),
+              setAuthorId(""),
+              setIsbn(""),
+              setYear(""),
             )
           }
         >
