@@ -3,18 +3,11 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
-// interface RequestBody {
-//   title: string;
-//   authorId: number;
-//   isbn?: string;
-//   year?: number;
-// }
-
 const schema = z.object({
   title: z.string().min(1),
   authorId: z.number().int().positive(),
-  isbn: z.string().optional().nullish(),
-  year: z.number().int().optional().nullable(),
+  isbn: z.string().optional(),
+  year: z.number().int().optional(),
 });
 
 type Body = z.infer<typeof schema>;
@@ -56,7 +49,7 @@ export async function POST(request: Request) {
     const [newBookWithAuthor] = await db
       .select()
       .from(books)
-      .innerJoin(authors, eq(books.authorId, authorId))
+      .innerJoin(authors, eq(books.authorId, authors.id))
       .where(eq(books.id, newBook.id));
 
     return NextResponse.json(newBookWithAuthor, { status: 201 });
