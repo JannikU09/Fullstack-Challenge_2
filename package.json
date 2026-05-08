@@ -1,7 +1,7 @@
 {
   "name": "fullstack-challenge",
   "private": true,
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.0.8",
   "scripts": {
     "db:start": "docker compose up -d",
     "db:stop": "docker compose down",
