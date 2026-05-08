@@ -1,7 +1,7 @@
 {
   "name": "fullstack-challenge",
   "private": true,
-  "packageManager": "pnpm@10.30.2",
+  "packageManager": "pnpm@11.0.8",
   "scripts": {
     "db:start": "docker compose up -d",
     "db:stop": "docker compose down",
@@ -28,10 +28,16 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
     "@types/pg": "8.15.4",
-    "drizzle-kit": "0.31.1"
+    "drizzle-kit": "0.31.1",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
     "drizzle-orm": "0.44.2",
-    "pg": "8.16.0"
+    "pg": "8.16.0",
+    "pnpm": "^10.33.2"
   }
 }
