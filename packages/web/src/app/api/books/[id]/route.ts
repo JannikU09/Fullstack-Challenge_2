@@ -4,8 +4,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
 
 const schema = z.object({
-  title: z.string().optional(),
-  authorId: z.number().int().positive().optional(),
+  title: z.string(),
+  authorId: z.number().int().positive(),
   isbn: z.string().optional(),
   year: z.number().optional(),
 });
