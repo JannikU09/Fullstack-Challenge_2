@@ -310,7 +310,7 @@ import { eq } from "drizzle-orm";
 
 1. `PUT /api/books/[id]` — Body wie POST, partielle Updates erlaubt
 2. 404 falls nicht vorhanden, 200 mit aktualisiertem Buch bei Erfolg
-3. Zod-Schema für PUT (alle Felder optional)
+3. Zod-Schema für PUT (`title` und `authorId` weiterhin Pflicht);
 4. Frontend: Bearbeiten-Button pro Buch → öffnet `BookForm` (Inline oder Modal) mit `initialValues`
 5. **Dieselbe `BookForm` aus Aufgabe 3** für Create + Edit — `onSubmit` entscheidet POST vs. PUT
 
