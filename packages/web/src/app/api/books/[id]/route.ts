@@ -1,14 +1,7 @@
 import { books, db } from "@repo/database";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
-import * as z from "zod";
-
-const schema = z.object({
-  title: z.string(),
-  authorId: z.number().int().positive(),
-  isbn: z.string().optional(),
-  year: z.number().optional(),
-});
+import { schema } from "../route";
 
 type Body = z.infer<typeof schema>;
 

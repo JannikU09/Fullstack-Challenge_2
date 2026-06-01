@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
-const schema = z.object({
+export const schema = z.object({
   title: z.string().min(1),
   authorId: z.number().int().positive(),
   isbn: z.string().optional(),
