@@ -52,8 +52,8 @@ export default function BooksPage() {
 
   // Neues Buch hinzufügen
   async function createBook(event, data: BookWithAuthor) {
-    console.log(event, data);
-    const res = await fetch("/api/books", {
+    console.log("createBook", event, data);
+    const _res = await fetch("/api/books", {
       method: "POST",
       body: JSON.stringify({
         title: data.Books.title,
@@ -62,37 +62,34 @@ export default function BooksPage() {
         year: Number(data.Books.year),
       }),
     });
-    const newBook: BookWithAuthor = await res.json();
-    console.log("newBook", newBook);
-    setAllBooks([newBook, ...allBooks].sort((a, b) => a.Author.id - b.Author.id));
+
+    const res = await fetch("api/books");
+    const newBook: BookWithAuthor[] = await res.json();
+    setAllBooks(newBook);
   }
 
   // Bestehendes Buch bearbeiten
-  async function updateBook(event, book: BookWithAuthor) {
-    console.log(event, book);
-
-    const _res = await fetch(`api/books/${book.Books.id}`, {
+  async function updateBook(event, data: BookWithAuthor) {
+    console.log(event, data);
+    const _res = await fetch(`api/books/${data.Books.id}`, {
       method: "PUT",
       body: JSON.stringify({
-        title: book.Books.title,
-        authorId: book.Books.authorId,
-        isbn: book.Books.isbn,
-        year: Number(book.Books.year),
+        title: data.Books.title,
+        authorId: data.Books.authorId,
+        isbn: data.Books.isbn,
+        year: Number(data.Books.year),
       }),
     });
 
-    console.log(_res, book);
-
-    console.log("updateBook", event, book);
     const res = await fetch("api/books");
     const updatedBook: BookWithAuthor[] = await res.json();
     setAllBooks(updatedBook);
     setOpenEditor(false);
   }
 
-  function handleOnSubmit(event, book) {
-    updateBook(event, book);
-    console.log(book);
+  function handleOnSubmit(event, data) {
+    updateBook(event, data);
+    console.log(data);
   }
 
   // Einzelne Bücher löschen
