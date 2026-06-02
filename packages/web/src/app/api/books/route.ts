@@ -1,5 +1,5 @@
 import { authors, books, db } from "@repo/database";
-import { eq } from "drizzle-orm";
+import { and, eq, ilike } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -12,14 +12,29 @@ export const schema = z.object({
 
 type Body = z.infer<typeof schema>;
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const query = searchParams.get("q");
+  const authorId = searchParams.get("authorId");
+  console.log(query, authorId);
+  const parsedAuthorId = authorId ? Number(authorId) : null;
   try {
-    const allBooks = await db
-      .select()
-      .from(books)
-      .innerJoin(authors, eq(books.authorId, authors.id))
-      .orderBy(books.authorId, books.year);
-    return NextResponse.json(allBooks, { statusText: "Liste der Bücher" });
+    if ((query && query?.length > 0) || (parsedAuthorId && parsedAuthorId > 0)) {
+      const allBooks = await db
+        .select()
+        .from(books)
+        .where(and(ilike(books.title, `%${query}%`), eq(books.authorId, authorId)))
+        .innerJoin(authors, eq(books.authorId, authors.id))
+        .orderBy(books.authorId, books.year);
+      return NextResponse.json(allBooks, { statusText: "Liste der gesuchten Bücher" });
+    } else {
+      const allBooks = await db
+        .select()
+        .from(books)
+        .innerJoin(authors, eq(books.authorId, authors.id))
+        .orderBy(books.authorId, books.year);
+      return NextResponse.json(allBooks, { statusText: "Liste aller Bücher" });
+    }
   } catch {
     return NextResponse.json({ error: "Failed to fetch books" }, { status: 500 });
   }
