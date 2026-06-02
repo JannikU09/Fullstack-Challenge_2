@@ -1,6 +1,16 @@
 "use client";
 
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { Button } from "@/componentes/ui/Button";
 import { BookForm } from "../../componentes/BookForm/BookForm";
@@ -28,17 +38,39 @@ interface Author {
 export default function BooksPage() {
   const [allBooks, setAllBooks] = useState<BookWithAuthor[]>([]);
   const [allAuthors, setAllAuthors] = useState<Author[]>([]);
-  const [openEditor, setOpenEditor] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [authorIdSearch, setAuthorIdSearch] = useState<Author>("");
 
   // Bücher laden
   useEffect(() => {
     async function bookFetch() {
-      const res = await fetch("/api/books");
+      const res = await fetch(`/api/books`);
       const data: BookWithAuthor[] = await res.json();
       setAllBooks(data);
     }
     bookFetch();
   }, []);
+
+  // Bücher nach Suche laden
+  async function handleSearch() {
+    console.log(authorIdSearch);
+    const res = await fetch(
+      `/api/books?q=${encodeURIComponent(query)}&authorId=${encodeURIComponent(authorIdSearch)}`,
+    );
+    console.log(res);
+    const data: BookWithAuthor = await res.json();
+    console.log(data);
+    if (Array.isArray(data) !== true) return;
+    setAllBooks(data);
+  }
+
+  // Büchersuche zurücksetzen
+  async function resetSearch() {
+    const res = await fetch(`/api/books`);
+    const data: BookWithAuthor[] = await res.json();
+    setAllBooks(data);
+  }
 
   // Autoren laden
   useEffect(() => {
@@ -84,7 +116,7 @@ export default function BooksPage() {
     const res = await fetch("api/books");
     const updatedBook: BookWithAuthor[] = await res.json();
     setAllBooks(updatedBook);
-    setOpenEditor(false);
+    setIsOpen(false);
   }
 
   function handleOnSubmit(event, data) {
@@ -104,11 +136,45 @@ export default function BooksPage() {
 
   return (
     <div>
+      <div className="search">
+        <TextField
+          style={{
+            width: "100%",
+          }}
+          value={query}
+          label="Search"
+          onChange={(event) => setQuery(event.target.value)}
+          autoComplete="off"
+        />
+        <div style={{ margin: "auto 5px" }} />
+        <FormControl fullWidth>
+          <InputLabel>Author</InputLabel>
+          <Select
+            value={authorIdSearch}
+            onChange={(event) => setAuthorIdSearch(event.target.value)}
+            label="Author"
+          >
+            {allAuthors.map((author) => (
+              <MenuItem key={author.id} value={author.id}>
+                {author.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <div className="searchButton">
+          <Button variant="primary" type="button" onClick={handleSearch}>
+            <strong>Search</strong>
+          </Button>
+          <Button variant="primary" type="button" onClick={resetSearch}>
+            <strong>Reset</strong>
+          </Button>
+        </div>
+      </div>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          marginBottom: "15px",
         }}
       >
         <h1>Bücher</h1>
@@ -144,11 +210,7 @@ export default function BooksPage() {
                     <p>
                       <strong>Year: </strong> {book.Books.year}
                     </p>
-                    <Button
-                      variant="primary"
-                      type="button"
-                      onClick={() => setOpenEditor(!openEditor)}
-                    >
+                    <Button variant="primary" type="button" onClick={() => setIsOpen(!isOpen)}>
                       <strong>Edit</strong>
                     </Button>
                     <Button
@@ -160,7 +222,7 @@ export default function BooksPage() {
                     </Button>
 
                     {/* Update FormFields */}
-                    <div className="updateForm" hidden={openEditor !== true}>
+                    <div className="updateForm" hidden={isOpen !== true}>
                       <div className="updateFormField">
                         <BookForm
                           initialValues={{
