@@ -1,5 +1,5 @@
 import { authors, books, db } from "@repo/database";
-import { and, eq, ilike } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
       const allBooks = await db
         .select()
         .from(books)
-        .where(and(ilike(books.title, `%${query}%`), eq(books.authorId, authorId)))
+        .where(or(ilike(books.title, `%${query}%`), eq(books.authorId, parsedAuthorId)))
         .innerJoin(authors, eq(books.authorId, authors.id))
         .orderBy(books.authorId, books.year);
       return NextResponse.json(allBooks, { statusText: "Liste der gesuchten Bücher" });
