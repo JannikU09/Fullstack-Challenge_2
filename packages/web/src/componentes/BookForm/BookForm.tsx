@@ -3,25 +3,7 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useState } from "react";
 import { Button } from "@/componentes/ui/Button";
-import type { BookWithAuthor } from "../../app/books/page";
-
-interface BookInitialValues {
-  id?: number;
-  title?: string;
-  authorId?: number;
-  isbn?: string;
-  year?: number;
-}
-
-interface BookFormProps {
-  initialValues?: BookInitialValues;
-  authors: {
-    id: number;
-    name: string;
-  }[];
-  onSubmit?: (event, data: BookWithAuthor) => Promise<void> | void;
-  submitLabel?: string;
-}
+import type { BookFormProps } from "../../app/interfaces/BookFormProps";
 
 export function BookForm({
   initialValues,
@@ -33,6 +15,15 @@ export function BookForm({
   const [authorId, setAuthorId] = useState(initialValues?.authorId ?? "");
   const [isbn, setIsbn] = useState(initialValues?.isbn ?? "");
   const [year, setYear] = useState(initialValues?.year ?? "");
+
+  const handleEmptyFields = () => {
+    if (!initialValues) {
+      setTitle("");
+      setAuthorId("");
+      setIsbn("");
+      setYear("");
+    }
+  };
 
   return (
     <div>
@@ -94,10 +85,7 @@ export function BookForm({
                   year: year,
                 },
               },
-              setTitle(""),
-              setAuthorId(""),
-              setIsbn(""),
-              setYear(""),
+              handleEmptyFields(),
             )
           }
         >
