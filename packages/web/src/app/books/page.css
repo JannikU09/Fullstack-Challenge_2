@@ -29,9 +29,14 @@ p {
   align-items: center;
   flex-direction: row;
   width: 100%;
-  margin-bottom: 10px;
 }
 
 .searchButton {
   margin-left: 10px;
+}
+
+.pageSizeSelect {
+  width: 100%;
+  display: flex;
+  margin-bottom: 10px;
 }
