@@ -1,10 +1,4 @@
-interface ButtonProps {
-  children: React.ReactNode;
-  variant: "primary" | "danger";
-  type?: "button" | "submit";
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  disabled?: true | false;
-}
+import type { ButtonProps } from "../../app/interfaces/ButtonProps";
 
 export const Button: React.FC<ButtonProps> = ({ children, variant, type, onClick, disabled }) => {
   return (
