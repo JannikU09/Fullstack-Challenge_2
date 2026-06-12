@@ -63,6 +63,6 @@ export async function PUT(_req: NextRequest, ctx: RouteContext<"/api/books/[id]"
     return NextResponse.json(updatedBook, { status: 200 });
   } catch (error) {
     console.log(error);
-    return NextResponse.json({ error: "Buch nicht gefunden" }, { status: 404 });
+    return NextResponse.json({ error: "Buch existiert nicht" }, { status: 404 });
   }
 }
