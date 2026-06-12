@@ -8,69 +8,31 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  type SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/componentes/ui/Button";
 import { BookForm } from "../../componentes/BookForm/BookForm";
+import type { Author } from "../interfaces/Author";
+import type { BookResponse } from "../interfaces/BookRespone";
+import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
 import "./page.css";
-
-export interface BookWithAuthor {
-  Books: {
-    id: number;
-    title: string;
-    isbn?: string;
-    year?: number;
-    authorId: number;
-  };
-  Author: {
-    id: number;
-    name: string;
-  };
-}
-
-interface Author {
-  id: number;
-  name: string;
-}
 
 export default function BooksPage() {
   const [allBooks, setAllBooks] = useState<BookWithAuthor[]>([]);
   const [allAuthors, setAllAuthors] = useState<Author[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [authorIdSearch, setAuthorIdSearch] = useState<Author>("");
+  const [authorIdSearch, setAuthorIdSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Bücher laden
-  useEffect(() => {
-    async function bookFetch() {
-      const res = await fetch(`/api/books`);
-      const data: BookWithAuthor[] = await res.json();
-      setAllBooks(data);
-    }
-    bookFetch();
-  }, []);
-
-  // Bücher nach Suche laden
-  async function handleSearch() {
-    console.log(authorIdSearch);
-    const res = await fetch(
-      `/api/books?q=${encodeURIComponent(query)}&authorId=${encodeURIComponent(authorIdSearch)}`,
-    );
-    console.log(res);
-    const data: BookWithAuthor = await res.json();
-    console.log(data);
-    if (Array.isArray(data) !== true) return;
-    setAllBooks(data);
-  }
-
-  // Büchersuche zurücksetzen
-  async function resetSearch() {
-    const res = await fetch(`/api/books`);
-    const data: BookWithAuthor[] = await res.json();
-    setAllBooks(data);
-  }
+  let pages = [];
+  const pageSizeValue = [5, 20, 50, 75, 100];
 
   // Autoren laden
   useEffect(() => {
@@ -82,6 +44,78 @@ export default function BooksPage() {
     authorFetch();
   }, []);
 
+  const params = useSearchParams();
+  const q = params.get("q") || "";
+  const authorId = params.get("authorId") || "";
+  const pageUrl = params.get("page") || 1;
+  const pageSizeUrl = params.get("pageSize") || 20;
+
+  useEffect(() => {
+    if (q || authorId || pageUrl || pageSizeUrl) {
+      setQuery(q);
+      setAuthorIdSearch(authorId);
+      setPage(pageUrl);
+      setPageSize(pageSizeUrl);
+    }
+  }, [q, authorId, pageUrl, pageSizeUrl]);
+
+  const searchValue = query || q || "";
+  const searchAuthorId = authorIdSearch || authorId || "";
+  const searchPage = page || pageUrl || 1;
+  const searchPageSize = pageSize || pageSizeUrl || 20;
+
+  const handlePageUpdate = () => {
+    pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+    console.log(pages);
+  };
+
+  // Bücher laden
+  useEffect(() => {
+    async function bookFetch() {
+      const res = await fetch(
+        `/api/books?q=${searchValue}&authorId=${searchAuthorId}&page=${searchPage}&pageSize=${searchPageSize}`,
+      );
+      const data: BookResponse = await res.json();
+      setAllBooks(data.data);
+      console.log("data", data);
+      console.log(res);
+      setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    }
+    bookFetch();
+  }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize]);
+
+  pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  console.log(pages);
+
+  // Bücher nach Suche laden
+  async function handleSearch() {
+    const res = await fetch(
+      `/api/books?q=${searchValue}&authorId=${searchAuthorId}&page=${searchPage}&pageSize=${searchPageSize}`,
+    );
+    console.log(res);
+    const data: BookResponse = await res.json();
+    console.log("data: ", data);
+    if (Array.isArray(data.data) !== true) return;
+    setAllBooks(data.data);
+    setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    handlePageUpdate();
+  }
+
+  // Büchersuche zurücksetzen
+  async function resetSearch() {
+    const res = await fetch(
+      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
+    );
+    const data: BookResponse = await res.json();
+    setAllBooks(data.data);
+    setQuery("");
+    setAuthorIdSearch("");
+    setPageSize(20);
+    setPage(1);
+    setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    handlePageUpdate();
+  }
+
   // Neues Buch hinzufügen
   async function createBook(event, data: BookWithAuthor) {
     console.log("createBook", event, data);
@@ -91,13 +125,19 @@ export default function BooksPage() {
         title: data.Books.title,
         authorId: data.Books.authorId,
         isbn: data.Books.isbn,
-        year: Number(data.Books.year),
+        year: Number(data.Books.year) > 0 ? Number(data.Books.year) : undefined,
       }),
     });
 
-    const res = await fetch("api/books");
-    const newBook: BookWithAuthor[] = await res.json();
-    setAllBooks(newBook);
+    const res = await fetch(
+      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
+    );
+    console.log(res);
+    const newBook: BookResponse = await res.json();
+    setAllBooks(newBook.data);
+    console.log(allBooks);
+    setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    handlePageUpdate();
   }
 
   // Bestehendes Buch bearbeiten
@@ -109,14 +149,18 @@ export default function BooksPage() {
         title: data.Books.title,
         authorId: data.Books.authorId,
         isbn: data.Books.isbn,
-        year: Number(data.Books.year),
+        year: Number(data.Books.year) > 0 ? Number(data.Books.year) : undefined,
       }),
     });
 
-    const res = await fetch("api/books");
-    const updatedBook: BookWithAuthor[] = await res.json();
-    setAllBooks(updatedBook);
+    const res = await fetch(
+      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
+    );
+    const updatedBook: BookResponse = await res.json();
+    setAllBooks(updatedBook.data);
     setIsOpen(false);
+    setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    handlePageUpdate();
   }
 
   function handleOnSubmit(event, data) {
@@ -129,10 +173,22 @@ export default function BooksPage() {
     await fetch(`api/books/${bookId}`, {
       method: "DELETE",
     });
-    const res = await fetch("api/books");
-    const data: BookWithAuthor[] = await res.json();
-    setAllBooks(data);
+    const res = await fetch(
+      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
+    );
+    const data: BookResponse = await res.json();
+    setAllBooks(data.data);
+    setTotalPages(Math.ceil(data.total / Number(pageSize)));
+    handlePageUpdate();
   }
+
+  const handlePageSize = (event: SelectChangeEvent) => {
+    setPageSize(event.target.value as string);
+  };
+
+  const handlePageNumber = (event: SelectChangeEvent) => {
+    setPage(event.target.value as string);
+  };
 
   return (
     <div>
@@ -171,6 +227,31 @@ export default function BooksPage() {
           </Button>
         </div>
       </div>
+
+      <div className="pageSizeSelect">
+        <FormControl fullWidth disabled={totalPages <= 1}>
+          <InputLabel>Page</InputLabel>
+          <Select value={page} label="Page" onChange={handlePageNumber}>
+            {pages.map((pageValue) => (
+              <MenuItem key={pageValue} value={pageValue}>
+                {pageValue}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <div style={{ margin: "5px" }} />
+        <FormControl fullWidth>
+          <InputLabel>Page Size</InputLabel>
+          <Select value={pageSize} label="Page Size" onChange={handlePageSize}>
+            {pageSizeValue.map((size) => (
+              <MenuItem key={size} value={size}>
+                {size}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -189,7 +270,7 @@ export default function BooksPage() {
       >
         {/* Liste der Bücher */}
         <div className="books">
-          {allBooks.length === 0 ? (
+          {allBooks?.length === 0 ? (
             <p>Keine Bücher gefunden</p>
           ) : (
             allBooks.map((book) => (
@@ -204,10 +285,10 @@ export default function BooksPage() {
                     <p>
                       <strong>Author: </strong> {book.Author.name}
                     </p>
-                    <p>
+                    <p hidden={!book.Books.isbn}>
                       <strong>ISBN: </strong> {book.Books.isbn}
                     </p>
-                    <p>
+                    <p hidden={!book.Books.year}>
                       <strong>Year: </strong> {book.Books.year}
                     </p>
                     <Button variant="primary" type="button" onClick={() => setIsOpen(!isOpen)}>
@@ -222,7 +303,7 @@ export default function BooksPage() {
                     </Button>
 
                     {/* Update FormFields */}
-                    <div className="updateForm" hidden={isOpen !== true}>
+                    <div className="updateForm" hidden={!isOpen}>
                       <div className="updateFormField">
                         <BookForm
                           initialValues={{
