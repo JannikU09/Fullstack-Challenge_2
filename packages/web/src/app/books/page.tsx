@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/componentes/ui/Button";
 import { BookForm } from "../../componentes/BookForm/BookForm";
+import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import type { BookResponse } from "../interfaces/BookRespone";
 import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
@@ -26,6 +27,7 @@ export default function BooksPage() {
   const [allAuthors, setAllAuthors] = useState<Author[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 750);
   const [authorIdSearch, setAuthorIdSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -59,7 +61,7 @@ export default function BooksPage() {
     }
   }, [q, authorId, pageUrl, pageSizeUrl]);
 
-  const searchValue = query || q || "";
+  const searchValue = debouncedQuery || q || "";
   const searchAuthorId = authorIdSearch || authorId || "";
   const searchPage = page || pageUrl || 1;
   const searchPageSize = pageSize || pageSizeUrl || 20;
@@ -103,9 +105,7 @@ export default function BooksPage() {
 
   // Büchersuche zurücksetzen
   async function resetSearch() {
-    const res = await fetch(
-      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
-    );
+    const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
     const data: BookResponse = await res.json();
     setAllBooks(data.data);
     setQuery("");
@@ -129,9 +129,7 @@ export default function BooksPage() {
       }),
     });
 
-    const res = await fetch(
-      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
-    );
+    const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
     console.log(res);
     const newBook: BookResponse = await res.json();
     setAllBooks(newBook.data);
@@ -153,9 +151,7 @@ export default function BooksPage() {
       }),
     });
 
-    const res = await fetch(
-      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
-    );
+    const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
     const updatedBook: BookResponse = await res.json();
     setAllBooks(updatedBook.data);
     setIsOpen(false);
@@ -173,9 +169,7 @@ export default function BooksPage() {
     await fetch(`api/books/${bookId}`, {
       method: "DELETE",
     });
-    const res = await fetch(
-      `/api/books?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`,
-    );
+    const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
     const data: BookResponse = await res.json();
     setAllBooks(data.data);
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
