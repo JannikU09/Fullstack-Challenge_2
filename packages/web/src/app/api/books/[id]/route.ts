@@ -1,6 +1,7 @@
 import { books, db } from "@repo/database";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import type * as z from "zod";
 import { schema } from "../route";
 
 type Body = z.infer<typeof schema>;
