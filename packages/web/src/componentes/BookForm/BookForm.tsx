@@ -2,8 +2,8 @@
 
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useState } from "react";
-import { Button } from "@/componentes/ui/Button";
 import type { BookFormProps } from "../../app/interfaces/BookFormProps";
+import { Button } from "../ui/Button";
 
 export function BookForm({
   initialValues,
