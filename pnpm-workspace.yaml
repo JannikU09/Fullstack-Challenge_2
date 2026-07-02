@@ -8,3 +8,6 @@ allowBuilds:
   sharp: true
   tree-sitter: true
   tree-sitter-json: true
+  '@prisma/engines': true
+  prisma: true
+nodeLinker: node-modules
