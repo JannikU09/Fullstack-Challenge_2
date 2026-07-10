@@ -4,6 +4,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/
 import { useState } from "react";
 import type { BookFormProps } from "../../app/interfaces/BookFormProps";
 import { Button } from "../ui/Button";
+import "./bookForm.css";
 
 export function BookForm({
   initialValues,
@@ -59,6 +60,8 @@ export function BookForm({
           onChange={(event) => setIsbn(event.target.value)}
           autoComplete="off"
         />
+        <p className="isbnHilfstext" hidden={isbn.length >= 13}>Noch {13 - isbn.length} Zeichen</p>
+        <p className="isbnHilfstext" hidden={isbn.length <= 13}>{isbn.length - 13} Zeichen zu viel!</p>
         <div style={{ margin: "10px" }} />
 
         <TextField
