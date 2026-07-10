@@ -14,8 +14,8 @@ import {
 } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "@/componentes/ui/Button";
 import { BookForm } from "../../componentes/BookForm/BookForm";
+import { Button } from "../../componentes/ui/Button";
 import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import type { BookResponse } from "../interfaces/BookRespone";
@@ -42,15 +42,16 @@ export default function BooksPage() {
       const res = await fetch("/api/authors");
       const data: Author[] = await res.json();
       setAllAuthors(data);
+      console.log("Autoren", data)
     }
     authorFetch();
   }, []);
 
   const params = useSearchParams();
-  const q = params.get("q") || "";
-  const authorId = params.get("authorId") || "";
-  const pageUrl = params.get("page") || 1;
-  const pageSizeUrl = params.get("pageSize") || 20;
+  const q = params?.get("q") || "";
+  const authorId = params?.get("authorId") || "";
+  const pageUrl = params?.get("page") || 1;
+  const pageSizeUrl = params?.get("pageSize") || 20;
 
   useEffect(() => {
     if (q || authorId || pageUrl || pageSizeUrl) {
@@ -68,7 +69,6 @@ export default function BooksPage() {
 
   const handlePageUpdate = () => {
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-    console.log(pages);
   };
 
   // Bücher laden
@@ -87,7 +87,6 @@ export default function BooksPage() {
   }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize]);
 
   pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  console.log(pages);
 
   // Bücher nach Suche laden
   async function handleSearch() {
@@ -110,8 +109,8 @@ export default function BooksPage() {
     setAllBooks(data.data);
     setQuery("");
     setAuthorIdSearch("");
-    setPageSize(20);
-    setPage(1);
+    setPageSize("20");
+    setPage("1");
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
   }
@@ -178,6 +177,7 @@ export default function BooksPage() {
 
   const handlePageSize = (event: SelectChangeEvent) => {
     setPageSize(event.target.value as string);
+    setPage(1);
   };
 
   const handlePageNumber = (event: SelectChangeEvent) => {
@@ -267,7 +267,7 @@ export default function BooksPage() {
           {allBooks?.length === 0 ? (
             <p>Keine Bücher gefunden</p>
           ) : (
-            allBooks.map((book) => (
+            allBooks?.map((book) => (
               <div key={book.Books.id} className="book">
                 <Accordion>
                   <AccordionSummary aria-controls="panel1-content">

@@ -6,8 +6,8 @@ import * as z from "zod";
 export const schema = z.object({
   title: z.string().min(1),
   authorId: z.number().int().positive(),
-  isbn: z.string().optional(),
-  year: z.number().int().optional(),
+  isbn: z.string().max(13).optional(),
+  year: z.number().int().min(1000).max(9999).optional(),
 });
 
 type Body = z.infer<typeof schema>;

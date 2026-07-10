@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { bookTestList } from "../../lib/bookTestList";
 import BooksPage from "./page";
@@ -23,5 +24,11 @@ describe("BooksPage", () => {
   it("zeigt Bücher aus der API an", async () => {
     render(<BooksPage />);
     expect(await screen.findByText("Test-Buch")).toBeInTheDocument();
+  });
+});
+
+describe("POST-Test", () => {
+  it("ruft fetch mit POST auf", async () => {
+    render(<BooksPage />);
   });
 });
