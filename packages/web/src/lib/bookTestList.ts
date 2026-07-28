@@ -12,3 +12,7 @@ export const bookTestList: BookWithAuthor = [
         Author: { id: 1, name: "Autor" }
     }
 ]
+
+export const authorTestList = [
+    { id: 1, name: "Autor" }
+]

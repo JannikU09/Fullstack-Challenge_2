@@ -8,7 +8,7 @@
     "dev": "next dev",
     "lint": "biome check .",
     "start": "next start",
-    "test": "vitest run"
+    "test": "vitest"
   },
   "dependencies": {
     "@repo/database": "workspace:*",
