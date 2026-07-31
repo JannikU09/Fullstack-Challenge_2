@@ -13,7 +13,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "web_test": "pnpm --filter @repo/web test"
+    "web_test": "pnpm --filter @repo/web test",
+    "table_push": "pnpm --filter @repo/database db:push"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
