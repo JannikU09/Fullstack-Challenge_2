@@ -59,6 +59,7 @@ export function BookForm({
           label="ISBN"
           onChange={(event) => setIsbn(event.target.value)}
           autoComplete="off"
+          required
         />
         <p className="isbnHilfstext" hidden={isbn.length >= 13}>Noch {13 - isbn.length} Zeichen</p>
         <p className="isbnHilfstext" hidden={isbn.length <= 13}>{isbn.length - 13} Zeichen zu viel!</p>
