@@ -21,7 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/books">Bücher</Link>
             <Link href="/api-doc">API Docs</Link>
           </nav>
-          <Toaster />
+          <Toaster
+            richColors
+            expand
+          />
           <main>{children}</main>
         </div>
       </body>
