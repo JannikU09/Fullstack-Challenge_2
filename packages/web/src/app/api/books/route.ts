@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   const offset = (page - 1) * pageSize;
   console.log("page:", page, "pageSize:", pageSize, "offset:", offset);
   console.log(query, authorId);
-  const parsedAuthorId = authorId ? Number(authorId) : null;
+  const parsedAuthorId = Number(authorId);
   try {
     if ((query && query?.length > 0) || (parsedAuthorId && parsedAuthorId > 0)) {
       const allBooks = await db
