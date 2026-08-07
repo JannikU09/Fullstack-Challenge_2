@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Toaster } from "../componentes/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Fullstack Challenge",
-  description: "Buchverwaltung – Fullstack Challenge",
+  description: "Buchverwaltung - Fullstack Challenge",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/books">Bücher</Link>
             <Link href="/api-doc">API Docs</Link>
           </nav>
+          <Toaster
+            richColors
+            expand
+          />
           <main>{children}</main>
         </div>
       </body>

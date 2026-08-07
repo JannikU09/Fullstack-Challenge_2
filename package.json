@@ -1,37 +1,37 @@
 {
   "name": "fullstack-challenge",
   "private": true,
-  "packageManager": "pnpm@10.30.2",
+  "packageManager": "pnpm@11.17.0",
   "scripts": {
+    "build": "pnpm --filter @repo/web build",
     "db:start": "docker compose up -d",
     "db:stop": "docker compose down",
-    "setup": "test -f packages/database/.env || cp packages/database/.env.example packages/database/.env && test -f packages/web/.env || cp packages/web/.env.example packages/web/.env && pnpm install && pnpm run db:start && pnpm --filter @repo/database db:push && pnpm --filter @repo/database seed",
     "dev": "pnpm --filter @repo/web dev",
+    "format": "biome format --write .",
+    "setup": "test -f packages/database/.env || cp packages/database/.env.example packages/database/.env && test -f packages/web/.env || cp packages/web/.env.example packages/web/.env && pnpm install && pnpm run db:start && pnpm --filter @repo/database db:push && pnpm --filter @repo/database seed",
+    "table": "pnpm --filter @repo/database db:push && pnpm --filter @repo/database studio",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/engines",
-      "@scarf/scarf",
-      "@tree-sitter-grammars/tree-sitter-yaml",
-      "core-js-pure",
-      "esbuild",
-      "prisma",
-      "sharp",
-      "tree-sitter",
-      "tree-sitter-json"
-    ]
+    "typecheck": "tsc --noEmit",
+    "web_test": "pnpm --filter @repo/web test",
+    "table_push": "pnpm --filter @repo/database db:push"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
     "@types/pg": "8.15.4",
-    "drizzle-kit": "0.31.1"
+    "drizzle-kit": "0.31.1",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.0.0",
+    "@mui/material": "^9.0.0",
     "drizzle-orm": "0.44.2",
-    "pg": "8.16.0"
+    "lucide-react": "^1.27.0",
+    "next-themes": "^0.4.6",
+    "pg": "8.16.0",
+    "pnpm": "^10.33.2",
+    "sonner": "^2.0.7"
   }
 }
