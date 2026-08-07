@@ -72,13 +72,13 @@ export function BookForm({
           autoComplete="off"
         />
         <h6 style={{ color: "gray" }}>required *</h6>
-        <div style={{ margin: "5px" }} />
+        <div style={{ margin: "2.5px" }} />
 
         <Button
           variant="primary"
           type="button"
-          onClick={(e) =>
-            onSubmit(
+          onClick={async (e) => {
+            await onSubmit?.(
               e,
               {
                 Books: {
@@ -88,10 +88,9 @@ export function BookForm({
                   isbn: isbn,
                   year: year,
                 },
-              },
-              handleEmptyFields(),
-            )
-          }
+              });
+            handleEmptyFields();
+          }}
         >
           <strong>{submitLabel}</strong>
         </Button>
