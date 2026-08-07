@@ -24,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Toaster
             richColors
             expand
+            duration={2500}
           />
           <main>{children}</main>
         </div>
