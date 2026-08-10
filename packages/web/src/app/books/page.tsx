@@ -81,7 +81,6 @@ export default function BooksPage() {
       const res = await fetch("/api/authors");
       const data: Author[] = await res.json();
       setAllAuthors(data);
-      console.log("Autoren", data);
     }
     authorFetch();
   }, []);
@@ -118,8 +117,6 @@ export default function BooksPage() {
       );
       const data: BookResponse = await res.json();
       setAllBooks(data.data);
-      console.log("data", data);
-      console.log(res);
       setTotalPages(Math.ceil(data.total / Number(pageSize)));
       toast.info(`Anzahl der Bücher: ${data.total}`, { id: "anzahlBücher_id", duration: 2650 });
     }
@@ -138,9 +135,7 @@ export default function BooksPage() {
     const res = await fetch(
       `/api/books?q=${searchValue}&authorId=${searchAuthorId}&page=${searchPage}&pageSize=${searchPageSize}`,
     );
-    console.log(res);
     const data: BookResponse = await res.json();
-    console.log("data: ", data);
     if (Array.isArray(data.data) !== true) return;
     setAllBooks(data.data);
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
@@ -167,7 +162,6 @@ export default function BooksPage() {
     startTransition(async () => {
       setOptimisticBooks({ type: "ADD", book: data });
 
-      console.log("createBook", data);
       const _res = await fetch("/api/books", {
         method: "POST",
         body: JSON.stringify({
@@ -184,13 +178,11 @@ export default function BooksPage() {
       }
 
       const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
-      console.log(res);
       const newBook: BookResponse = await res.json();
       setAllBooks(newBook.data);
       if (res.ok) {
         toast.info(`Anzahl der Bücher: ${newBook.total}`);
       }
-      console.log(allBooks);
       setTotalPages(Math.ceil(newBook.total / Number(pageSize)));
       handlePageUpdate();
     });
@@ -201,7 +193,6 @@ export default function BooksPage() {
     startTransition(async () => {
       setOptimisticBooks({ type: "UPDATE", book: data });
       setIsOpen(false);
-      console.log(data);
       const _res = await fetch(`api/books/${data.Books.id}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -222,7 +213,6 @@ export default function BooksPage() {
       }
 
       const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
-      console.log(res);
       const updatedBook: BookResponse = await res.json();
       setAllBooks(updatedBook.data);
       setTotalPages(Math.ceil(updatedBook.total / Number(pageSize)));
@@ -232,7 +222,6 @@ export default function BooksPage() {
 
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
-    console.log("updateBookData", data);
   }
 
   // Einzelne Bücher löschen
