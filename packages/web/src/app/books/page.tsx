@@ -50,7 +50,7 @@ export default function BooksPage() {
               isbn: action.book.Books.isbn,
               year: action.book.Books.year,
             },
-            Author: author2,
+            Author: author2 ? action.book.Authors.name : "",
           },
         ];
       }
