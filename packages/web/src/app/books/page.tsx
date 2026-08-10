@@ -79,6 +79,7 @@ export default function BooksPage() {
   useEffect(() => {
     async function authorFetch() {
       const res = await fetch("/api/authors");
+      if (!res.ok) return;
       const data: Author[] = await res.json();
       setAllAuthors(data);
     }
@@ -115,6 +116,7 @@ export default function BooksPage() {
       const res = await fetch(
         `/api/books?q=${searchValue}&authorId=${searchAuthorId}&page=${searchPage}&pageSize=${searchPageSize}`,
       );
+      if (!res.ok) return;
       const data: BookResponse = await res.json();
       setAllBooks(data.data);
       setTotalPages(Math.ceil(data.total / Number(pageSize)));
@@ -135,6 +137,7 @@ export default function BooksPage() {
     const res = await fetch(
       `/api/books?q=${searchValue}&authorId=${searchAuthorId}&page=${searchPage}&pageSize=${searchPageSize}`,
     );
+    if (!res.ok) return;
     const data: BookResponse = await res.json();
     if (Array.isArray(data.data) !== true) return;
     setAllBooks(data.data);
@@ -146,6 +149,7 @@ export default function BooksPage() {
   // Büchersuche zurücksetzen
   async function resetSearch() {
     const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
+    if (!res.ok) return;
     const data: BookResponse = await res.json();
     setAllBooks(data.data);
     setQuery("");
@@ -175,6 +179,7 @@ export default function BooksPage() {
         toast.success("Das Buch wurde hinzugefügt", { description: `${data.Books.title}` });
       } else {
         toast.error("Das Buch konnte nicht hinzugefügt werden.");
+        return;
       }
 
       const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
@@ -182,6 +187,8 @@ export default function BooksPage() {
       setAllBooks(newBook.data);
       if (res.ok) {
         toast.info(`Anzahl der Bücher: ${newBook.total}`);
+      } else {
+        return;
       }
       setTotalPages(Math.ceil(newBook.total / Number(pageSize)));
       handlePageUpdate();
@@ -210,9 +217,11 @@ export default function BooksPage() {
         toast.error("Das Buch konnte nicht angepasst werden.", {
           description: `${data.Books.title}`,
         });
+        return;
       }
 
       const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
+      if (!res.ok) return;
       const updatedBook: BookResponse = await res.json();
       setAllBooks(updatedBook.data);
       setTotalPages(Math.ceil(updatedBook.total / Number(pageSize)));
@@ -233,6 +242,7 @@ export default function BooksPage() {
       });
       if (_res.ok) {
         const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
+        if (!res.ok) return;
         const data: BookResponse = await res.json();
         setAllBooks(data.data);
         setTotalPages(Math.ceil(data.total / Number(pageSize)));
@@ -240,6 +250,7 @@ export default function BooksPage() {
         toast.success("Das Buch wurde gelöscht.");
       } else {
         toast.error(`Das Löschen ist fehlgeschlagen.`);
+        return;
       }
     });
   }
