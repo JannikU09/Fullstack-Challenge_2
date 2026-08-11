@@ -12,11 +12,20 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
-import { startTransition, useEffect, useOptimistic, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BookForm } from "../../componentes/BookForm/BookForm";
 import { Button } from "../../componentes/ui/Button";
+import {
+  allAuthorsAtom,
+  allBooksAtom,
+  pageAtom,
+  pageSizeAtom,
+  totalPagesAtom,
+} from "../../componentes/utils/atoms";
+import { useBookActions } from "../../componentes/utils/bookOperations";
 import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import type { BookResponse } from "../interfaces/BookRespone";
@@ -24,53 +33,17 @@ import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
 import "./page.css";
 
 export default function BooksPage() {
-  const [allBooks, setAllBooks] = useState<BookWithAuthor[]>([]);
-  const [allAuthors, setAllAuthors] = useState<Author[]>([]);
+  const [allBooks, setAllBooks] = useAtom(allBooksAtom);
+  const [allAuthors, setAllAuthors] = useAtom(allAuthorsAtom);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 750);
   const [authorIdSearch, setAuthorIdSearch] = useState("");
-  const [page, setPage] = useState("1");
-  const [pageSize, setPageSize] = useState("20");
-  const [totalPages, setTotalPages] = useState(1);
-  const [optimisticBooks, setOptimisticBooks] = useOptimistic(allBooks, switchOperations);
+  const [page, setPage] = useAtom(pageAtom);
+  const [pageSize, setPageSize] = useAtom(pageSizeAtom);
+  const [totalPages, setTotalPages] = useAtom(totalPagesAtom);
 
-  function switchOperations(currentBooks: BookWithAuthor[], action) {
-    switch (action.type) {
-
-      case "ADD": {
-        const author2 = allAuthors.find((a) => a.id === Number(action.book.Books.authorId));
-        return [
-          ...currentBooks,
-          {
-            Books: {
-              id: Date.now(),
-              title: action.book.Books.title,
-              authorId: action.book.Books.authorId,
-              isbn: action.book.Books.isbn,
-              year: action.book.Books.year,
-            },
-            Author: author2 ? action.book.Authors.name : "",
-          },
-        ];
-      }
-
-      case "UPDATE":
-        return currentBooks.map((book) => {
-          if (book.Books.id === action.book.Books.id) {
-            return { ...book, Books: { ...book.Books, ...action.book.Books } };
-          } else {
-            return book;
-          }
-        });
-
-      case "DELETE":
-        return currentBooks.filter((book) => book.Books.id !== action.id);
-
-      default:
-        return currentBooks;
-    }
-  }
+  const { optimisticBooks, createBook, updateBook, deleteBook } = useBookActions();
 
   let pages = [];
   const pageSizeValue = [5, 20, 50, 75, 100];
@@ -84,7 +57,7 @@ export default function BooksPage() {
       setAllAuthors(data);
     }
     authorFetch();
-  }, []);
+  }, [setAllAuthors]);
 
   const params = useSearchParams();
   const q = params?.get("q") || "";
@@ -99,7 +72,7 @@ export default function BooksPage() {
       setPage(pageUrl);
       setPageSize(pageSizeUrl);
     }
-  }, [q, authorId, pageUrl, pageSizeUrl]);
+  }, [q, authorId, pageUrl, pageSizeUrl, setPage, setPageSize]);
 
   const searchValue = debouncedQuery || q || "";
   const searchAuthorId = authorIdSearch || authorId || "";
@@ -128,7 +101,7 @@ export default function BooksPage() {
       success: "Bücher geladen.",
       error: (err) => `${err.message}`,
     });
-  }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize]);
+  }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize, setAllBooks, setTotalPages,]);
 
   pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -161,98 +134,9 @@ export default function BooksPage() {
     toast.info(`Es werden wieder alle ${data.total} Bücher angezeigt.`);
   }
 
-  // Neues Buch hinzufügen
-  async function createBook(_event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
-    startTransition(async () => {
-      setOptimisticBooks({ type: "ADD", book: data });
-
-      const _res = await fetch("/api/books", {
-        method: "POST",
-        body: JSON.stringify({
-          title: data.Books.title,
-          authorId: data.Books.authorId,
-          isbn: data.Books.isbn,
-          year: Number(data.Books.year) > 0 ? Number(data.Books.year) : undefined,
-        }),
-      });
-      if (_res.ok) {
-        toast.success("Das Buch wurde hinzugefügt", { description: `${data.Books.title}` });
-      } else {
-        toast.error("Das Buch konnte nicht hinzugefügt werden.");
-        return;
-      }
-
-      const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
-      const newBook: BookResponse = await res.json();
-      setAllBooks(newBook.data);
-      if (res.ok) {
-        toast.info(`Anzahl der Bücher: ${newBook.total}`);
-      } else {
-        return;
-      }
-      setTotalPages(Math.ceil(newBook.total / Number(pageSize)));
-      handlePageUpdate();
-    });
-  }
-
-  // Bestehendes Buch bearbeiten
-  async function updateBook(_event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
-    startTransition(async () => {
-      setOptimisticBooks({ type: "UPDATE", book: data });
-      setIsOpen(false);
-      const _res = await fetch(`api/books/${data.Books.id}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          title: data.Books.title,
-          authorId: data.Books.authorId,
-          isbn: data.Books.isbn,
-          year: Number(data.Books.year) > 0 ? Number(data.Books.year) : undefined,
-        }),
-      });
-      if (_res.ok) {
-        toast.success(`Das Buch wurde angepasst.`, {
-          description: `${data.Books.title}`
-        });
-      } else {
-        toast.error("Das Buch konnte nicht angepasst werden.", {
-          description: `${data.Books.title}`,
-        });
-        return;
-      }
-
-      const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
-      if (!res.ok) return;
-      const updatedBook: BookResponse = await res.json();
-      setAllBooks(updatedBook.data);
-      setTotalPages(Math.ceil(updatedBook.total / Number(pageSize)));
-      handlePageUpdate();
-    });
-  }
-
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
-  }
-
-  // Einzelne Bücher löschen
-  async function deleteBook(bookId: number) {
-    startTransition(async () => {
-      setOptimisticBooks({ type: "DELETE", id: bookId });
-      const _res = await fetch(`api/books/${bookId}`, {
-        method: "DELETE",
-      });
-      if (_res.ok) {
-        const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
-        if (!res.ok) return;
-        const data: BookResponse = await res.json();
-        setAllBooks(data.data);
-        setTotalPages(Math.ceil(data.total / Number(pageSize)));
-        handlePageUpdate();
-        toast.success("Das Buch wurde gelöscht.");
-      } else {
-        toast.error(`Das Löschen ist fehlgeschlagen.`);
-        return;
-      }
-    });
+    setIsOpen(false);
   }
 
   const handlePageSize = (event: SelectChangeEvent) => {
@@ -356,9 +240,6 @@ export default function BooksPage() {
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <p>
-                      <strong>ID: </strong> {book.Books.id}
-                    </p>
                     <p>
                       <strong>Author: </strong> {book.Author.name}
                     </p>
