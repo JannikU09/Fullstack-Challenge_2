@@ -1,7 +1,7 @@
 {
   "name": "fullstack-challenge",
   "private": true,
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
   "scripts": {
     "build": "pnpm --filter @repo/web build",
     "db:start": "docker compose up -d",
@@ -28,6 +28,7 @@
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "drizzle-orm": "0.44.2",
+    "jotai": "^2.20.2",
     "lucide-react": "^1.27.0",
     "next-themes": "^0.4.6",
     "pg": "8.16.0",
