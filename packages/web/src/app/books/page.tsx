@@ -30,6 +30,7 @@ import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import type { BookResponse } from "../interfaces/BookRespone";
 import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
+import { createBookAction, deleteBookAction, updateBookAction } from "./actions";
 import "./page.css";
 
 export default function BooksPage() {
@@ -101,7 +102,15 @@ export default function BooksPage() {
       success: "Bücher geladen.",
       error: (err) => `${err.message}`,
     });
-  }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize, setAllBooks, setTotalPages,]);
+  }, [
+    searchValue,
+    searchAuthorId,
+    searchPage,
+    searchPageSize,
+    pageSize,
+    setAllBooks,
+    setTotalPages,
+  ]);
 
   pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
