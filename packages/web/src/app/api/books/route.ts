@@ -3,7 +3,7 @@ import { count, eq, ilike, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 
-export const schema = z.object({
+const schema = z.object({
   title: z.string().min(1),
   authorId: z.number().int().positive(),
   isbn: z.string().min(13).max(13),
