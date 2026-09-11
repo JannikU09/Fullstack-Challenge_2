@@ -32,6 +32,7 @@ import { createBookAction, deleteBookAction, updateBookAction } from "./actions"
 import "./page.css";
 
 export default function BooksPage() {
+  //client
   const [allBooks, setAllBooks] = useAtom(allBooksAtom);
   const [allAuthors, setAllAuthors] = useAtom(allAuthorsAtom);
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +65,7 @@ export default function BooksPage() {
   const pageUrl = params?.get("page") || "1";
   const pageSizeUrl = params?.get("pageSize") || "20";
 
+  //client
   useEffect(() => {
     if (q || authorId || pageUrl || pageSizeUrl) {
       setQuery(q);
@@ -82,6 +84,7 @@ export default function BooksPage() {
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   };
 
+  //client
   // Bücher laden
   useEffect(() => {
     async function bookFetch() {
@@ -112,6 +115,7 @@ export default function BooksPage() {
 
   pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  //client
   // Bücher nach Suche laden
   async function handleSearch() {
     const res = await fetch(
@@ -124,8 +128,9 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Anzahl der Bücher: ${data.total}`);
-  }
+  };
 
+  //client
   // Büchersuche zurücksetzen
   async function resetSearch() {
     const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
@@ -139,18 +144,21 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Es werden wieder alle ${data.total} Bücher angezeigt.`);
-  }
+  };
 
+  //client
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
     setIsOpen(false);
-  }
+  };
 
+  //client
   const handlePageSize = (event: SelectChangeEvent) => {
     setPageSize(event.target.value as string);
     setPage("1");
   };
 
+  //client
   const handlePageNumber = (event: SelectChangeEvent) => {
     setPage(event.target.value as string);
   };
