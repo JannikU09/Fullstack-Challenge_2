@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Accordion,
   AccordionDetails,
@@ -7,7 +9,6 @@ import {
   MenuItem,
   Select,
   type SelectChangeEvent,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useAtom } from "jotai";
@@ -16,11 +17,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BookForm } from "../../componentes/BookForm/BookForm";
 import { Button } from "../../componentes/ui/Button";
+import { SearchBar } from "../../componentes/ui/SearchBar";
 import {
   allAuthorsAtom,
   allBooksAtom,
   pageAtom,
   pageSizeAtom,
+  queryAtom,
   totalPagesAtom,
 } from "../../componentes/utils/atoms";
 import { useBookActions } from "../../componentes/utils/bookOperations";
@@ -36,7 +39,7 @@ export default function BooksPage() {
   const [allBooks, setAllBooks] = useAtom(allBooksAtom);
   const [allAuthors, setAllAuthors] = useAtom(allAuthorsAtom);
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useAtom(queryAtom);
   const debouncedQuery = useDebounce(query, 750);
   const [authorIdSearch, setAuthorIdSearch] = useState("");
   const [page, setPage] = useAtom(pageAtom);
@@ -73,7 +76,7 @@ export default function BooksPage() {
       setPage(pageUrl);
       setPageSize(pageSizeUrl);
     }
-  }, [q, authorId, pageUrl, pageSizeUrl, setPage, setPageSize]);
+  }, [q, authorId, pageUrl, pageSizeUrl, setPage, setPageSize, setQuery]);
 
   const searchValue = debouncedQuery || q || "";
   const searchAuthorId = authorIdSearch || authorId || "";
@@ -96,7 +99,7 @@ export default function BooksPage() {
       setAllBooks(data.data);
       setTotalPages(Math.ceil(data.total / Number(pageSize)));
       toast.info(`Anzahl der Bücher: ${data.total}`, { id: "anzahlBücher_id", duration: 2650 });
-    };
+    }
     bookFetch();
     toast.promise(bookFetch(), {
       loading: "Bücher werden geladen...",
@@ -128,7 +131,7 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Anzahl der Bücher: ${data.total}`);
-  };
+  }
 
   //client
   // Büchersuche zurücksetzen
@@ -144,13 +147,13 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Es werden wieder alle ${data.total} Bücher angezeigt.`);
-  };
+  }
 
   //client
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
     setIsOpen(false);
-  };
+  }
 
   //client
   const handlePageSize = (event: SelectChangeEvent) => {
@@ -166,15 +169,7 @@ export default function BooksPage() {
   return (
     <div>
       <div className="search">
-        <TextField
-          style={{
-            width: "100%",
-          }}
-          value={query}
-          label="Search"
-          onChange={(event) => setQuery(event.target.value)}
-          autoComplete="off"
-        />
+        <SearchBar />
         <div style={{ margin: "auto 5px" }} />
         <FormControl fullWidth>
           <InputLabel>Author</InputLabel>
