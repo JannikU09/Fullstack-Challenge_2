@@ -48,7 +48,7 @@ export async function PUT(_req: NextRequest, ctx: RouteContext<"/api/books/[id]"
       year,
     };
 
-    const result = schema2.safeParse(data, { reportInput: true });
+    const result = schema.safeParse(data, { reportInput: true });
     console.log(result);
 
     if (!result.success) {
