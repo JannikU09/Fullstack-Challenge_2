@@ -21,11 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/books">Bücher</Link>
             <Link href="/api-doc">API Docs</Link>
           </nav>
-          <Toaster
-            richColors
-            expand
-            duration={2500}
-          />
+          <Toaster richColors expand duration={2500} />
           <main>{children}</main>
         </div>
       </body>

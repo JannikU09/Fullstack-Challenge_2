@@ -96,7 +96,7 @@ export default function BooksPage() {
       setAllBooks(data.data);
       setTotalPages(Math.ceil(data.total / Number(pageSize)));
       toast.info(`Anzahl der Bücher: ${data.total}`, { id: "anzahlBücher_id", duration: 2650 });
-    };
+    }
     bookFetch();
     toast.promise(bookFetch(), {
       loading: "Bücher werden geladen...",
@@ -128,7 +128,7 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Anzahl der Bücher: ${data.total}`);
-  };
+  }
 
   //client
   // Büchersuche zurücksetzen
@@ -144,13 +144,13 @@ export default function BooksPage() {
     setTotalPages(Math.ceil(data.total / Number(pageSize)));
     handlePageUpdate();
     toast.info(`Es werden wieder alle ${data.total} Bücher angezeigt.`);
-  };
+  }
 
   //client
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
     setIsOpen(false);
-  };
+  }
 
   //client
   const handlePageSize = (event: SelectChangeEvent) => {

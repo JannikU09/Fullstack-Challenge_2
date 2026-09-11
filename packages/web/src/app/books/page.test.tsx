@@ -6,7 +6,6 @@ import BooksPage from "./page";
 
 beforeEach(() => {
   global.fetch = vi.fn((url) => {
-
     // if (String(url).includes("/api/authors")) {
     //   console.log("oben", String(url));
     //   return Promise.resolve(
@@ -27,7 +26,7 @@ beforeEach(() => {
             data: bookTestList,
             total: 1,
           }),
-          { status: 200 }
+          { status: 200 },
         ),
       );
     }
@@ -45,27 +44,29 @@ describe("BooksPage", () => {
 
 describe("POST-Test", () => {
   it("ruft fetch mit POST auf", async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
     fetchSpy
-      .mockResolvedValueOnce(new Response(JSON.stringify({ data: authorTestList }), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: authorTestList }), { status: 200 }),
+      )
       // .mockResolvedValueOnce(new Response(JSON.stringify({ data: bookTestList, total: 1 }), { status: 200 }))
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({
-          success: true,
-          data: {
-            title: "Neues Buch",
-            authorId: 1,
-            isbn: "234523462546245",
-            year: 2026
-          },
-        }),
-          { status: 200 }
-        )
+        new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              title: "Neues Buch",
+              authorId: 1,
+              isbn: "234523462546245",
+              year: 2026,
+            },
+          }),
+          { status: 200 },
+        ),
       );
 
     console.log("authorTestList", authorTestList);
     console.log("isArray", Array.isArray(authorTestList));
-
 
     render(<BooksPage />);
 
@@ -75,10 +76,10 @@ describe("POST-Test", () => {
     await user.type(titleInput, "Neues Buch");
     await user.click(screen.getByRole("button", { name: "Add" }));
 
-    expect(fetchSpy).toHaveBeenCalled()
+    expect(fetchSpy).toHaveBeenCalled();
     expect(fetchSpy).toHaveBeenCalledWith(
       expect.stringContaining("/api/books"),
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({ method: "POST" }),
     );
   });
 });
