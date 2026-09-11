@@ -95,5 +95,5 @@ export function useBookActions() {
         });
     };
 
-    return { optimisticBooks, createBook, updateBook, deleteBook };
+    return { optimisticBooks, createBook, updateBook, deleteBook, reload };
 }

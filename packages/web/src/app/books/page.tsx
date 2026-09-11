@@ -9,7 +9,6 @@ import {
   MenuItem,
   Select,
   type SelectChangeEvent,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useAtom } from "jotai";
@@ -18,11 +17,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BookForm } from "../../componentes/BookForm/BookForm";
 import { Button } from "../../componentes/ui/Button";
+import { SearchBar } from "../../componentes/ui/SearchBar";
 import {
   allAuthorsAtom,
   allBooksAtom,
   pageAtom,
   pageSizeAtom,
+  queryAtom,
   totalPagesAtom,
 } from "../../componentes/utils/atoms";
 import { useBookActions } from "../../componentes/utils/bookOperations";
@@ -30,20 +31,22 @@ import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import type { BookResponse } from "../interfaces/BookRespone";
 import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
+import { createBookAction, deleteBookAction, updateBookAction } from "./actions";
 import "./page.css";
 
 export default function BooksPage() {
+  //client
   const [allBooks, setAllBooks] = useAtom(allBooksAtom);
   const [allAuthors, setAllAuthors] = useAtom(allAuthorsAtom);
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useAtom(queryAtom);
   const debouncedQuery = useDebounce(query, 750);
   const [authorIdSearch, setAuthorIdSearch] = useState("");
   const [page, setPage] = useAtom(pageAtom);
   const [pageSize, setPageSize] = useAtom(pageSizeAtom);
   const [totalPages, setTotalPages] = useAtom(totalPagesAtom);
 
-  const { optimisticBooks, createBook, updateBook, deleteBook } = useBookActions();
+  const { optimisticBooks, createBook, updateBook, deleteBook, reload } = useBookActions();
 
   let pages = [];
   const pageSizeValue = [5, 20, 50, 75, 100];
@@ -65,6 +68,7 @@ export default function BooksPage() {
   const pageUrl = params?.get("page") || "1";
   const pageSizeUrl = params?.get("pageSize") || "20";
 
+  //client
   useEffect(() => {
     if (q || authorId || pageUrl || pageSizeUrl) {
       setQuery(q);
@@ -72,7 +76,7 @@ export default function BooksPage() {
       setPage(pageUrl);
       setPageSize(pageSizeUrl);
     }
-  }, [q, authorId, pageUrl, pageSizeUrl, setPage, setPageSize]);
+  }, [q, authorId, pageUrl, pageSizeUrl, setPage, setPageSize, setQuery]);
 
   const searchValue = debouncedQuery || q || "";
   const searchAuthorId = authorIdSearch || authorId || "";
@@ -83,6 +87,7 @@ export default function BooksPage() {
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   };
 
+  //client
   // Bücher laden
   useEffect(() => {
     async function bookFetch() {
@@ -101,10 +106,19 @@ export default function BooksPage() {
       success: "Bücher geladen.",
       error: (err) => `${err.message}`,
     });
-  }, [searchValue, searchAuthorId, searchPage, searchPageSize, pageSize, setAllBooks, setTotalPages,]);
+  }, [
+    searchValue,
+    searchAuthorId,
+    searchPage,
+    searchPageSize,
+    pageSize,
+    setAllBooks,
+    setTotalPages,
+  ]);
 
   pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
+  //client
   // Bücher nach Suche laden
   async function handleSearch() {
     const res = await fetch(
@@ -119,6 +133,7 @@ export default function BooksPage() {
     toast.info(`Anzahl der Bücher: ${data.total}`);
   }
 
+  //client
   // Büchersuche zurücksetzen
   async function resetSearch() {
     const res = await fetch(`/api/books?page=${page}&pageSize=${pageSize}`);
@@ -134,16 +149,19 @@ export default function BooksPage() {
     toast.info(`Es werden wieder alle ${data.total} Bücher angezeigt.`);
   }
 
+  //client
   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
     updateBook(event, data);
     setIsOpen(false);
   }
 
+  //client
   const handlePageSize = (event: SelectChangeEvent) => {
     setPageSize(event.target.value as string);
     setPage("1");
   };
 
+  //client
   const handlePageNumber = (event: SelectChangeEvent) => {
     setPage(event.target.value as string);
   };
@@ -151,15 +169,7 @@ export default function BooksPage() {
   return (
     <div>
       <div className="search">
-        <TextField
-          style={{
-            width: "100%",
-          }}
-          value={query}
-          label="Search"
-          onChange={(event) => setQuery(event.target.value)}
-          autoComplete="off"
-        />
+        <SearchBar />
         <div style={{ margin: "auto 5px" }} />
         <FormControl fullWidth>
           <InputLabel>Author</InputLabel>
