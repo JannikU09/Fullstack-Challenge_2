@@ -2,7 +2,7 @@ import { books, db } from "@repo/database";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import type * as z from "zod";
-import { schema } from "../route";
+import type { schema } from "../route";
 
 type Body = z.infer<typeof schema>;
 
@@ -48,7 +48,7 @@ export async function PUT(_req: NextRequest, ctx: RouteContext<"/api/books/[id]"
       year,
     };
 
-    const result = schema.safeParse(data, { reportInput: true });
+    const result = schema2.safeParse(data, { reportInput: true });
     console.log(result);
 
     if (!result.success) {
