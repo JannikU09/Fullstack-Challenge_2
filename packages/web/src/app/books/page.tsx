@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Accordion,
   AccordionDetails,
@@ -44,7 +42,7 @@ export default function BooksPage() {
   const [pageSize, setPageSize] = useAtom(pageSizeAtom);
   const [totalPages, setTotalPages] = useAtom(totalPagesAtom);
 
-  const { optimisticBooks, createBook, updateBook, deleteBook } = useBookActions();
+  const { optimisticBooks, createBook, updateBook, deleteBook, reload } = useBookActions();
 
   let pages = [];
   const pageSizeValue = [5, 20, 50, 75, 100];
@@ -95,7 +93,7 @@ export default function BooksPage() {
       setAllBooks(data.data);
       setTotalPages(Math.ceil(data.total / Number(pageSize)));
       toast.info(`Anzahl der Bücher: ${data.total}`, { id: "anzahlBücher_id", duration: 2650 });
-    }
+    };
     bookFetch();
     toast.promise(bookFetch(), {
       loading: "Bücher werden geladen...",
