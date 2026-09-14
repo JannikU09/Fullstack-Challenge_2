@@ -8,3 +8,4 @@ export const pageAtom = atom("1");
 export const pageSizeAtom = atom("20");
 export const totalPagesAtom = atom(1);
 export const queryAtom = atom("");
+export const authorIdAtom = atom("");
