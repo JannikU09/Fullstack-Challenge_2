@@ -10,4 +10,4 @@ allowBuilds:
   tree-sitter-json: true
   '@prisma/engines': true
   prisma: true
-nodeLinker: node-modules
+nodeLinker: isolated
