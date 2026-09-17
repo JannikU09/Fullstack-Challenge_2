@@ -20,7 +20,7 @@ export default async function BooksPage({
     <div>
       <BooksFilters authors={authors} search={search} />
 
-      <BooksPagination search={search} totalPages={totalPages} />
+      <BooksPagination search={search} totalPages={totalPages} total={total} />
 
       <div
         style={{
@@ -28,7 +28,11 @@ export default async function BooksPage({
           justifyContent: "space-between",
         }}
       >
-        <h1>Bücher ({total})</h1>
+
+        {total === 1 ?
+          <h1>{total} Buch</h1> :
+          <h1>{total} Bücher</h1>
+        }
         <h1>Neues Buch</h1>
       </div>
 
