@@ -34,7 +34,7 @@ export const BookList = ({ books, authors, search }: BookListProps) => {
       >
          <div className="books">
             {books.length === 0 ? (
-               <p>Keine Bücher gefunden</p>
+               <p>Keine Bücher gefunden.</p>
             ) : (
                books.map((book) => (
                   <div key={book.Books.id} className="book">
