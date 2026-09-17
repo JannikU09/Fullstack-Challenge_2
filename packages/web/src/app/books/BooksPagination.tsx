@@ -1,36 +1,37 @@
 "use client";
 
-import {
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    type SelectChangeEvent,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } from "@mui/material";
 import { useAtom } from "jotai";
+import { useEffect } from "react";
 import { pageAtom, pageSizeAtom, totalPagesAtom } from "../../componentes/utils/atoms";
 import "./page.css";
+import type { BookSearchParams } from "../interfaces/searchParams";
 
-export const BooksPagination = (search, totalPages) => {
+type BooksPaginationProps = {
+    search: BookSearchParams;
+    totalPages: number;
+    total: number;
+};
+
+export const BooksPagination = ({ search, totalPages, total }: BooksPaginationProps) => {
     const [page, setPage] = useAtom(pageAtom);
     const [pageSize, setPageSize] = useAtom(pageSizeAtom);
-    // const [totalPages, setTotalPages] = useAtom(totalPagesAtom);
 
     let pages = [];
     const pageSizeValue = [5, 20, 50, 75, 100];
 
     function handlePageUpdate() {
         pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-    };
+    }
 
     function handlePageNumber(event: SelectChangeEvent) {
         setPage(event.target.value as string);
-    };
+    }
 
     function handlePageSize(event: SelectChangeEvent) {
         setPageSize(event.target.value as string);
         setPage("1");
-    };
+    }
 
     return (
         <div className="pageSizeSelect">
