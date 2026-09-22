@@ -86,9 +86,9 @@ export function BookForm({
                 Books: {
                   id: initialValues?.id,
                   title: title,
-                  authorId: authorId,
+                  authorId: Number(authorId),
                   isbn: isbn,
-                  year: year,
+                  year: year === "" ? undefined : Number(year),
                 },
               });
             handleEmptyFields();
