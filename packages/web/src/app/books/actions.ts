@@ -31,9 +31,13 @@ export async function getBooks(params: BookSearchParams) {
     }
     if (params.page) {
         console.log(params.page);
+    } else {
+        params.page = 1;
     }
     if (params.pageSize) {
         console.log(params.pageSize);
+    } else {
+        params.pageSize = 20;
     }
 
     console.log("filters", filters);
@@ -59,7 +63,12 @@ export async function getBooks(params: BookSearchParams) {
         data,
         total,
         totalPages,
-        search: params.q ?? "",
+        search: {
+            q: params.q,
+            authorId: params.authorId,
+            page: params.page,
+            pageSize: params.pageSize,
+        },
     };
 }
 
@@ -69,21 +78,28 @@ export async function getAuthors() {
 }
 
 export async function createBookAction(bookInput: BookWithAuthor) {
-    const result = schema.safeParse(bookInput, { reportInput: true });
+    const result = schema.safeParse(bookInput.Books, { reportInput: true });
     console.log(result);
 
     if (!result.success) {
         return { success: false, error: "Validation Error" };
     }
 
-    await db.insert(books).values(result.data).returning();
+    const [newBook] = await db.insert(books).values(result.data).returning();
+    const [newBookWithAuthor] = await db
+        .select()
+        .from(books)
+        .innerJoin(authors, eq(books.authorId, authors.id))
+        .where(eq(books.id, newBook.id));
+
     revalidatePath("/books");
-    return { success: true };
+    return { success: true, data: newBookWithAuthor };
 }
 
 export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
-    const result = schema.safeParse(bookInput, { reportInput: true });
-    console.log(result);
+    const result = schema.safeParse(bookInput.Books, { reportInput: true });
+    console.log(result.data);
+    console.log(bookInput);
 
     if (!result.success) {
         return { success: false, error: "Validation Error" };
