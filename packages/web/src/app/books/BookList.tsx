@@ -1,12 +1,13 @@
 "use client";
 
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookForm } from "../../componentes/BookForm/BookForm";
 import { Button } from "../../componentes/ui/Button";
 import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
 import { createBookAction, deleteBookAction, updateBookAction } from "./actions";
 import "./page.css";
+import { toast } from "sonner";
 import type { Author } from "../interfaces/Author";
 import type { BookSearchParams } from "../interfaces/searchParams";
 
@@ -19,10 +20,9 @@ type BookListProps = {
 export const BookList = ({ books, authors, search }: BookListProps) => {
    const [isOpen, setIsOpen] = useState(false);
 
-   function handleOnSubmit(event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) {
-      updateBookAction(event, data);
-      setIsOpen(false);
-   };
+   useEffect(() => {
+      toast.success("Bücher geladen");
+   }, [])
 
    return (
       <div
@@ -62,7 +62,7 @@ export const BookList = ({ books, authors, search }: BookListProps) => {
                               type="button"
                               onClick={() => deleteBookAction(book.Books.id)}
                            >
-                              Delete
+                              <strong>Delete</strong>
                            </Button>
 
                            {/* Update FormFields */}
@@ -77,7 +77,10 @@ export const BookList = ({ books, authors, search }: BookListProps) => {
                                        year: book.Books.year,
                                     }}
                                     authors={authors}
-                                    onSubmit={handleOnSubmit}
+                                    onSubmit={(_e, data) => {
+                                       updateBookAction(book.Books.id, data);
+                                       setIsOpen(false);
+                                    }}
                                     submitLabel="Update"
                                  />
                               </div>
@@ -91,7 +94,11 @@ export const BookList = ({ books, authors, search }: BookListProps) => {
 
          {/* Formular um Bücher hinzuzufügen */}
          <div className="formField">
-            <BookForm authors={authors} onSubmit={createBookAction} submitLabel="Add" />
+            <BookForm
+               authors={authors}
+               onSubmit={(_e, data) => createBookAction(data)}
+               submitLabel="Add"
+            />
          </div>
       </div>
    );
