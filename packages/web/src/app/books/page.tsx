@@ -18,7 +18,7 @@ export default async function BooksPage({
 
   return (
     <div>
-      <BooksFilters authors={authors} search={search} />
+      <BooksFilters authors={authors} search={search} total={total} books={books} />
 
       <BooksPagination search={search} totalPages={totalPages} total={total} />
 
