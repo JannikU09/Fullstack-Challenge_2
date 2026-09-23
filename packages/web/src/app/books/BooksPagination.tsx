@@ -1,48 +1,60 @@
 "use client";
 
-import { FormControl, InputLabel, MenuItem, Select, type SelectChangeEvent } from "@mui/material";
-import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
-import { pageAtom, pageSizeAtom, totalPagesAtom } from "../../componentes/utils/atoms";
-import type { BookSearchParams } from "../interfaces/searchParams";
-import { getBooks } from "./actions";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { useAtomValue } from "jotai";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { pageSizeValueAtom } from "../../componentes/utils/atoms";
 import "./page.css";
 
 type BooksPaginationProps = {
-    search: BookSearchParams;
     totalPages: number;
-    total: number;
 };
 
-export const BooksPagination = ({ search, totalPages, total }: BooksPaginationProps) => {
-    // const [page, setPage] = useAtom(pageAtom);
-    const [page, setPage] = useState(search.page);
-    const [pageSize, setPageSize] = useState(search.pageSize);
+export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+    const pageSizeValue = useAtomValue(pageSizeValueAtom);
 
-    console.log("totalPages", totalPages);
-    console.log("total", total);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { replace } = useRouter();
 
     let pages = [];
-    const pageSizeValue = [5, 20, 50, 75, 100];
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    function handlePageNumber(event: SelectChangeEvent) {
-        setPage(event.target.value as string);
-    }
+    function handlePageNumber(pageNumber: number) {
+        const params = new URLSearchParams(searchParams);
+        if (pageNumber) {
+            params.set("page", pageNumber)
+            setPage(pageNumber);
+        } else {
+            params.set("page", 1);
+        }
+        replace(`${pathname}?${params.toString()}`);
+    };
 
-    function handlePageSize(event: SelectChangeEvent) {
-        setPageSize(event.target.value as string);
-        setPage(1);
-    }
+    function handlePageSize(pageSizeNow: number) {
+        const params = new URLSearchParams(searchParams);
+        if (pageSizeNow) {
+            params.set("pageSize", pageSizeNow);
+            params.set("page", 1)
+            setPageSize(pageSizeNow);
+            setPage(1);
+        } else {
+            params.set("pageSize", 20);
+        }
+        replace(`${pathname}?${params.toString()}`);
+    };
 
     return (
         <div className="pageSizeSelect">
             <FormControl fullWidth disabled={totalPages <= 1}>
                 <InputLabel>Page</InputLabel>
-                <Select value={page} label="Page" onChange={handlePageNumber}>
-                    {pages.map((pageValue) => (
-                        <MenuItem key={pageValue} value={pageValue}>
-                            {pageValue}
+                <Select value={page} label="Page" onChange={(event) => handlePageNumber(event.target.value)}>
+                    {pages.map((currentPage) => (
+                        <MenuItem key={currentPage} value={currentPage}>
+                            {currentPage}
                         </MenuItem>
                     ))}
                 </Select>
@@ -50,7 +62,7 @@ export const BooksPagination = ({ search, totalPages, total }: BooksPaginationPr
             <div style={{ margin: "5px" }} />
             <FormControl fullWidth>
                 <InputLabel>Page Size</InputLabel>
-                <Select value={pageSize} label="Page Size" onChange={handlePageSize}>
+                <Select value={pageSize} label="Page Size" onChange={(event) => handlePageSize(event.target.value)}>
                     {pageSizeValue.map((size) => (
                         <MenuItem key={size} value={size}>
                             {size}
