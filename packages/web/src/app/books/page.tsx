@@ -20,6 +20,8 @@ export default async function BooksPage({
     <div>
       <BooksFilters authors={authors} search={search} total={total} books={books} />
 
+      <div style={{ margin: "10px" }} />
+
       <BooksPagination search={search} totalPages={totalPages} total={total} />
 
       <div
