@@ -19,28 +19,13 @@ export async function getBooks(params: BookSearchParams) {
     const offset: number = (params.page - 1) * params.pageSize;
     const filters = [];
 
-    console.log(params.page, params.pageSize);
 
     if (params.q) {
         filters.push(ilike(books.title, `%${params.q}%`));
-        console.log(params.q);
     }
     if (params.authorId) {
         filters.push(eq(books.authorId, Number(params.authorId)));
-        console.log(params.authorId);
     }
-    if (params.page) {
-        console.log(params.page);
-    } else {
-        params.page = 1;
-    }
-    if (params.pageSize) {
-        console.log(params.pageSize);
-    } else {
-        params.pageSize = 20;
-    }
-
-    console.log("filters", filters);
 
     const isFilter = filters.length ? and(...filters) : undefined;
 
@@ -79,7 +64,6 @@ export async function getAuthors() {
 
 export async function createBookAction(bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
-    console.log(result);
 
     if (!result.success) {
         return { success: false, error: "Validation Error" };
@@ -98,8 +82,6 @@ export async function createBookAction(bookInput: BookWithAuthor) {
 
 export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
-    console.log(result.data);
-    console.log(bookInput);
 
     if (!result.success) {
         return { success: false, error: "Validation Error" };
