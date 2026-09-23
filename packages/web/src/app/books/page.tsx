@@ -11,18 +11,18 @@ export default async function BooksPage({
   searchParams: Promise<BookSearchParams>;
 }) {
   const params = await searchParams;
-  const [{ data: books, total, search, totalPages }, authors] = await Promise.all([
+  const [{ data: books, total, totalPages }, authors] = await Promise.all([
     getBooks(params),
     getAuthors(),
   ]);
 
   return (
     <div>
-      <BooksFilters authors={authors} search={search} total={total} books={books} />
+      <BooksFilters authors={authors} />
 
       <div style={{ margin: "10px" }} />
 
-      <BooksPagination search={search} totalPages={totalPages} total={total} />
+      <BooksPagination totalPages={totalPages} />
 
       <div
         style={{
@@ -38,7 +38,7 @@ export default async function BooksPage({
         <h1>Neues Buch</h1>
       </div>
 
-      <BookList books={books} authors={authors} search={search} />
+      <BookList books={books} authors={authors} />
     </div>
   );
 };
