@@ -48,12 +48,6 @@ export async function getBooks(params: BookSearchParams) {
         data,
         total,
         totalPages,
-        search: {
-            q: params.q,
-            authorId: params.authorId,
-            page: params.page,
-            pageSize: params.pageSize,
-        },
     };
 }
 
