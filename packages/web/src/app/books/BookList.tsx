@@ -9,15 +9,13 @@ import { createBookAction, deleteBookAction, updateBookAction } from "./actions"
 import "./page.css";
 import { toast } from "sonner";
 import type { Author } from "../interfaces/Author";
-import type { BookSearchParams } from "../interfaces/searchParams";
 
 type BookListProps = {
    books: BookWithAuthor[];
    authors: Author[];
-   search: BookSearchParams;
 };
 
-export const BookList = ({ books, authors, search }: BookListProps) => {
+export const BookList = ({ books, authors }: BookListProps) => {
    const [isOpen, setIsOpen] = useState(false);
 
    useEffect(() => {
