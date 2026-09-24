@@ -26,6 +26,12 @@ export async function getBooks(params: BookSearchParams) {
     if (params.authorId) {
         filters.push(eq(books.authorId, Number(params.authorId)));
     }
+    if (!params.page) {
+        params.page = 1;
+    }
+    if (!params.pageSize) {
+        params.pageSize = 20;
+    }
 
     const isFilter = filters.length ? and(...filters) : undefined;
 
