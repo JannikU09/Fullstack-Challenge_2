@@ -2,25 +2,26 @@
 
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { BookForm } from "../../componentes/BookForm/BookForm";
 import { Button } from "../../componentes/ui/Button";
+import type { Author } from "../interfaces/Author";
 import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
 import { createBookAction, deleteBookAction, updateBookAction } from "./actions";
 import "./page.css";
-import { toast } from "sonner";
-import type { Author } from "../interfaces/Author";
 
 type BookListProps = {
    books: BookWithAuthor[];
    authors: Author[];
+   total: number;
 };
 
-export const BookList = ({ books, authors }: BookListProps) => {
+export const BookList = ({ books, authors, total }: BookListProps) => {
    const [isOpen, setIsOpen] = useState(false);
 
    useEffect(() => {
-      toast.success("Bücher geladen");
-   }, [])
+      toast.success(`${total} Bücher geladen.`);
+   }, [total]);
 
    return (
       <div
