@@ -18,11 +18,9 @@ export default async function BooksPage({
 
   return (
     <div>
-      <BooksFilters authors={authors} />
+      <BooksFilters authors={authors} total={total} />
 
-      <div style={{ margin: "10px" }} />
-
-      <BooksPagination totalPages={totalPages} />
+      <div style={{ margin: "5px" }} />
 
       <div
         style={{
@@ -38,7 +36,11 @@ export default async function BooksPage({
         <h1>Neues Buch</h1>
       </div>
 
-      <BookList books={books} authors={authors} />
+      <BookList books={books} authors={authors} total={total} />
+
+      <div style={{ margin: "15px" }} />
+
+      <BooksPagination totalPages={totalPages} />
     </div>
   );
 };
