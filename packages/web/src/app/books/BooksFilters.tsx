@@ -5,16 +5,16 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../componentes/ui/Button";
-import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
 import "./page.css";
 
 type BooksFiltersProps = {
     authors: Author[];
     total: number;
+    totalWithoutFilter: number;
 };
 
-export const BooksFilters = ({ authors, total }: BooksFiltersProps) => {
+export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFiltersProps) => {
     const [q, setQ] = useState("");
     const [authorId, setAuthorId] = useState("");
 
@@ -58,7 +58,8 @@ export const BooksFilters = ({ authors, total }: BooksFiltersProps) => {
         setAuthorId("");
         setQ("");
         replace(`${pathname}?${params.toString()}`);
-        toast.info(`Es werden wieder alle ${total} Bücher angezeigt.`);
+        console.log(total);
+        toast.info(`Es werden wieder alle ${totalWithoutFilter} Bücher angezeigt.`);
     }
 
     return (

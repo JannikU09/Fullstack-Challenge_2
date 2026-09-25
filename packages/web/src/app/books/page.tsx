@@ -11,14 +11,14 @@ export default async function BooksPage({
   searchParams: Promise<BookSearchParams>;
 }) {
   const params = await searchParams;
-  const [{ data: books, total, totalPages }, authors] = await Promise.all([
+  const [{ data: books, total, totalPages, totalWithoutFilter }, authors] = await Promise.all([
     getBooks(params),
     getAuthors(),
   ]);
 
   return (
     <div>
-      <BooksFilters authors={authors} total={total} />
+      <BooksFilters authors={authors} total={total} totalWithoutFilter={totalWithoutFilter} />
 
       <div style={{ margin: "5px" }} />
 

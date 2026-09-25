@@ -35,7 +35,7 @@ export async function getBooks(params: BookSearchParams) {
 
     const isFilter = filters.length ? and(...filters) : undefined;
 
-    const [data, totalBooks] = await Promise.all([
+    const [data, totalBooks, totalBooksWithoutFilter] = await Promise.all([
         db
             .select()
             .from(books)
@@ -45,15 +45,18 @@ export async function getBooks(params: BookSearchParams) {
             .limit(Number(params.pageSize))
             .offset(offset),
         db.select({ total: count() }).from(books).where(isFilter),
+        db.select({ total: count() }).from(books),
     ]);
 
     const total = totalBooks[0].total;
+    const totalWithoutFilter = totalBooksWithoutFilter[0].total;
     const totalPages = Math.ceil(total / params.pageSize);
 
     return {
         data,
         total,
         totalPages,
+        totalWithoutFilter,
     };
 }
 
