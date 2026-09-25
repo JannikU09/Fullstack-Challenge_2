@@ -20,7 +20,9 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
    const [isOpen, setIsOpen] = useState(false);
 
    useEffect(() => {
-      toast.success(`${total} Bücher geladen.`);
+      total === 1 ?
+         toast.success(`${total} Buch geladen.`) :
+         toast.success(`${total} Bücher geladen.`);
    }, [total]);
 
    return (
