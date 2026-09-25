@@ -2,27 +2,37 @@
 
 import { FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "../../componentes/ui/Button";
+import { useDebounce } from "../../lib/useDebounce";
 import type { Author } from "../interfaces/Author";
+import "./page.css";
 
 type BooksFiltersProps = {
     authors: Author[];
+    total: number;
 };
 
-export const BooksFilters = ({ authors }: BooksFiltersProps) => {
+export const BooksFilters = ({ authors, total }: BooksFiltersProps) => {
     const [q, setQ] = useState("");
     const [authorId, setAuthorId] = useState("");
 
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
+    const params = new URLSearchParams(searchParams);
+
+    useEffect(() => {
+        setQ(params.get("q") ?? "");
+        setAuthorId(params.get("authorId") ?? "");
+    }, [params.get]);
 
     function handleSearch(term: string) {
-        const params = new URLSearchParams(searchParams);
         if (term) {
             params.set("q", term);
-            setQ(term)
+            params.set("page", 1);
+            setQ(term);
         } else {
             params.delete("q");
             setQ("");
@@ -31,9 +41,9 @@ export const BooksFilters = ({ authors }: BooksFiltersProps) => {
     }
 
     function handleAuhorIdChange(id: number) {
-        const params = new URLSearchParams(searchParams);
         if (id) {
             params.set("authorId", id);
+            params.set("page", 1);
             setAuthorId(id);
         } else {
             params.delete("authorId");
@@ -41,13 +51,14 @@ export const BooksFilters = ({ authors }: BooksFiltersProps) => {
         replace(`${pathname}?${params.toString()}`);
     }
 
-    function reset() {
-        const params = new URLSearchParams(searchParams);
+    function resetSearch() {
         params.delete("q");
         params.delete("authorId");
+        params.set("page", 1);
         setAuthorId("");
-        setQ("")
+        setQ("");
         replace(`${pathname}?${params.toString()}`);
+        toast.info(`Es werden wieder alle ${total} Bücher angezeigt.`);
     }
 
     return (
@@ -57,9 +68,7 @@ export const BooksFilters = ({ authors }: BooksFiltersProps) => {
                     width: "100%",
                 }}
                 label={"Search"}
-                onChange={(event) => {
-                    handleSearch(event.target.value);
-                }}
+                onChange={(event) => handleSearch(event.target.value)}
                 autoComplete="off"
                 value={q}
             />
@@ -80,7 +89,7 @@ export const BooksFilters = ({ authors }: BooksFiltersProps) => {
             </FormControl>
 
             <div className="searchButton">
-                <Button variant="primary" type="button" onClick={() => reset()}>
+                <Button variant="primary" type="button" onClick={() => resetSearch()}>
                     <strong>Reset</strong>
                 </Button>
             </div>
