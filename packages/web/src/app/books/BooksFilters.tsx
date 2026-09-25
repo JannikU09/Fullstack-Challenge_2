@@ -58,7 +58,6 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
         setAuthorId("");
         setQ("");
         replace(`${pathname}?${params.toString()}`);
-        console.log(total);
         toast.info(`Es werden wieder alle ${totalWithoutFilter} Bücher angezeigt.`);
     }
 
