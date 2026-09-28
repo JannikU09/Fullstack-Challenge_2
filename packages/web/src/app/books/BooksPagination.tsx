@@ -4,6 +4,7 @@ import { FormControl, InputLabel, MenuItem, Pagination, Select } from "@mui/mate
 import { useAtomValue } from "jotai";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Pagination2 } from "../../componentes/ui/Pagination";
 import { pageSizeValueAtom } from "../../componentes/utils/atoms";
 import "./page.css";
 
@@ -12,8 +13,8 @@ type BooksPaginationProps = {
 };
 
 export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(20);
+    const [page, setPage] = useState("1");
+    const [pageSize, setPageSize] = useState("20");
     const pageSizeValue = useAtomValue(pageSizeValueAtom);
 
     const searchParams = useSearchParams();
@@ -22,35 +23,33 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     const params = new URLSearchParams(searchParams);
 
     useEffect(() => {
-        setPage(Number(params.get("page")));
-        setPageSize(Number(params.get("pageSize")))
+        setPage(params.get("page") ?? "1");
+        setPageSize(params.get("pageSize") ?? "20");
     }, [params.get]);
-
 
     let pages = [];
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-
-    function handlePageNumber(pageNumber: number) {
+    function handlePageNumber(pageNumber: string) {
         if (pageNumber) {
             params.set("page", pageNumber);
             setPage(pageNumber);
         } else {
-            params.set("page", 1);
-            setPage(1);
+            params.set("page", "1");
+            setPage("1");
         }
         replace(`${pathname}?${params.toString()}`);
     }
 
-    function handlePageSize(pageSizeNow: number) {
+    function handlePageSize(pageSizeNow: string) {
         if (pageSizeNow) {
-            params.set("page", 1);
+            params.set("page", "1");
             params.set("pageSize", pageSizeNow);
             setPageSize(pageSizeNow);
-            setPage(1);
+            setPage("1");
         } else {
-            params.set("pageSize", 20);
-            setPageSize(20);
+            params.set("pageSize", "20");
+            setPageSize("20");
         }
         replace(`${pathname}?${params.toString()}`);
     }
@@ -58,10 +57,13 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     return (
         <div>
             <div className="choosePage">
+                <Pagination2 page={3} />
+            </div>
+            <div className="choosePage">
                 <Pagination
                     count={pages.length}
-                    page={page}
-                    onChange={(_event, page) => handlePageNumber(page)}
+                    page={Number(page)}
+                    onChange={(_event, page) => handlePageNumber(page.toString())}
                     shape="rounded"
                     sx={{
                         "& .MuiPaginationItem-root": {
