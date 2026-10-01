@@ -1,10 +1,10 @@
 "use client";
 
-import { FormControl, InputLabel, MenuItem, Pagination, Select } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Pagination2 } from "../../componentes/ui/Pagination";
+import { Pagination } from "../../componentes/ui/Pagination";
 import { pageSizeValueAtom } from "../../componentes/utils/atoms";
 import "./page.css";
 
@@ -30,17 +30,6 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     let pages = [];
     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    function handlePageNumber(pageNumber: string) {
-        if (pageNumber) {
-            params.set("page", pageNumber);
-            setPage(pageNumber);
-        } else {
-            params.set("page", "1");
-            setPage("1");
-        }
-        replace(`${pathname}?${params.toString()}`);
-    }
-
     function handlePageSize(pageSizeNow: string) {
         if (pageSizeNow) {
             params.set("page", "1");
@@ -57,24 +46,9 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     return (
         <div>
             <div className="choosePage">
-                <Pagination2 page={3} />
+                <Pagination page={Number(page)} count={pages.length} />
             </div>
-            <div className="choosePage">
-                <Pagination
-                    count={pages.length}
-                    page={Number(page)}
-                    onChange={(_event, page) => handlePageNumber(page.toString())}
-                    shape="rounded"
-                    sx={{
-                        "& .MuiPaginationItem-root": {
-                            width: "10px",
-                            height: "24px",
-                        },
-                    }}
-                    showFirstButton
-                    showLastButton
-                />
-            </div>
+            <div style={{ margin: "15px" }} />
             <div className="pageSizeSelect">
                 <FormControl sx={{ width: "100px" }}>
                     <InputLabel>Page Size</InputLabel>
@@ -90,7 +64,6 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
                         ))}
                     </Select>
                 </FormControl>
-                <div style={{ margin: "5px" }} />
             </div>
         </div>
     );
