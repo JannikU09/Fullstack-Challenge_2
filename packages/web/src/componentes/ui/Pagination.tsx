@@ -5,68 +5,92 @@ import { Button } from "./Button";
 import "../../app/books/page.css";
 
 type PaginationProps = {
-    count?: number | undefined;
+    totalPages?: number | undefined;
     page?: number | undefined;
+    itemsNextTo: number;
+    itemsAtStartEnd: number;
 };
 
-export const Pagination = ({ count, page }: PaginationProps) => {
+export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: PaginationProps) => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
     const params = new URLSearchParams(searchParams);
 
-    const [page1, setPage1] = useState<number>(page ?? 1);
+    const [currentPage, setCurrentPage] = useState<number>(page ?? 1);
 
     useEffect(() => {
-        setPage1(Number(params.get("page")) ?? 1);
+        setCurrentPage(Number(params.get("page")) ?? 1);
     }, [params.get]);
 
     const pageNumbers: number[] = [];
-    if (count !== undefined) {
-        for (let i = 1; i <= count; i++) {
+    if (totalPages !== undefined) {
+        for (let i = 1; i <= totalPages; i++) {
             pageNumbers.push(i);
         };
     };
 
-    const pagesTest: (number | "...")[] = [];
-    if (count !== undefined) {
-        for (let i = 1; i <= count; i++) {
-            if (
-                i === 1
-                || i === count
-                || i === page1
-                || i === page1 + 1
-                || i === page1 - 1
-                || (page1 <= 4 && i <= 5)
-                || (page1 >= count - 3 && i >= count - 4)
-            ) {
-                pagesTest.push(i);
-            } else if (pagesTest[pagesTest.length - 1] !== "...") {
-                pagesTest.push("...");
-            };
+    const paginationPages: (number | "dots-left" | "dots-right")[] = [];
+    if (totalPages !== undefined) {
+        const isNearStart = currentPage <= itemsAtStartEnd;
+        const isNearEnd = currentPage >= totalPages - itemsAtStartEnd + 1;
+
+        const showLeftDots = !isNearStart && currentPage - 1 > itemsNextTo;
+        const showRightDots = !isNearEnd && totalPages - currentPage > itemsNextTo;
+
+        paginationPages.push(1);
+
+        if (showLeftDots) {
+            paginationPages.push("dots-left");
+        };
+
+        let start: number;
+        let end: number;
+
+        if (isNearStart) {
+            start = 2;
+            end = Math.min(totalPages - 1, itemsAtStartEnd + 1);
+        } else if (isNearEnd) {
+            start = Math.max(2, totalPages - itemsAtStartEnd);
+            end = totalPages - 1;
+        } else {
+            start = showLeftDots ? Math.max(2, currentPage - itemsNextTo) : 2
+            end = showRightDots ? Math.min(totalPages - 1, currentPage + itemsNextTo) : totalPages - 1;
+        };
+
+        for (let i = start; i <= end; i++) {
+            paginationPages.push(i);
+        };
+
+        if (showRightDots) {
+            paginationPages.push("dots-right");
+        };
+
+        if (totalPages > 1) {
+            paginationPages.push(totalPages);
         };
     };
 
     function goToPage(newPage: number) {
-        if (count === undefined) return;
+        if (totalPages === undefined) return;
         const num = newPage;
         params.set("page", num.toString());
         replace(`${pathname}?${params.toString()}`);
-        setPage1(num);
+        setCurrentPage(num);
     };
 
     function increasePage() {
-        goToPage(page1 + 1);
+        goToPage(currentPage + 1);
     };
     function decreasePage() {
-        goToPage(page1 - 1);
+        goToPage(currentPage - 1);
     };
     function goToFirstPage() {
         goToPage(1);
     };
     function goToLastPage() {
-        if (count === undefined) return;
-        goToPage(count);
+        if (totalPages === undefined) return;
+        goToPage(totalPages);
     };
 
     return (
@@ -74,59 +98,71 @@ export const Pagination = ({ count, page }: PaginationProps) => {
             <div className="paginationPage">
                 <Button
                     type="button"
-                    variant="pagination"
+                    variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => goToFirstPage()}
-                    disabled={page1 <= 1}
+                    disabled={currentPage <= 1}
                 >
                     <FirstPage />
                 </Button>
                 <Button
                     type="button"
-                    variant="pagination"
+                    variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => decreasePage()}
-                    disabled={page1 <= 1}
+                    disabled={currentPage <= 1}
                 >
                     <ChevronLeft />
                 </Button>
 
-                {pagesTest.map((pageNumber, idx) => {
-                    if (page1 === pageNumber) {
+                {paginationPages.map((pageNumber) => {
+                    const isDot = typeof pageNumber !== "number";
+                    const label = isDot ? "..." : pageNumber;
+                    const key = isDot ? pageNumber : `page-${pageNumber}`;
+
+
+                    if (currentPage === pageNumber) {
                         return (
                             <Button
-                                key={idx}
+                                key={key}
                                 type="button"
                                 variant="paginationCurrent"
                             >
-                                {pageNumber}
+                                {label}
                             </Button>
                         )
                     }
                     return (
                         <Button
-                            disabled={pageNumber === "..."}
-                            key={idx}
+                            key={key}
                             type="button"
                             variant="pagination"
-                            onClick={() => goToPage(Number(pageNumber))}
+                            onClick={() => {
+                                if (pageNumber === "dots-left") {
+                                    goToPage(currentPage - itemsAtStartEnd);
+                                } else if (pageNumber === "dots-right") {
+                                    goToPage(currentPage + itemsAtStartEnd);
+                                } else {
+                                    goToPage(Number(pageNumber));
+                                }
+                            }}
                         >
-                            {pageNumber}
+                            {label}
                         </Button>
                     )
                 })}
 
                 <Button
                     type="button"
-                    variant="pagination"
+                    variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => increasePage()}
-                    disabled={count === undefined || page1 >= count}
+                    disabled={totalPages === undefined || currentPage >= totalPages}
                 >
                     <ChevronRight />
                 </Button>
                 <Button
                     type="button"
-                    variant="pagination"
+                    variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => goToLastPage()}
-                    disabled={count === undefined || page1 >= count}
+                    disabled={totalPages === undefined || currentPage >= totalPages}
                 >
                     <LastPage />
                 </Button>
