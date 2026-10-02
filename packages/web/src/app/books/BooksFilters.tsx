@@ -31,7 +31,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
     function handleSearch(term: string) {
         if (term) {
             params.set("q", term);
-            params.set("page", 1);
+            params.set("page", "1");
             setQ(term);
         } else {
             params.delete("q");
@@ -40,10 +40,10 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
         replace(`${pathname}?${params.toString()}`);
     }
 
-    function handleAuhorIdChange(id: number) {
+    function handleAuhorIdChange(id: string) {
         if (id) {
             params.set("authorId", id);
-            params.set("page", 1);
+            params.set("page", "1");
             setAuthorId(id);
         } else {
             params.delete("authorId");
@@ -54,7 +54,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
     function resetSearch() {
         params.delete("q");
         params.delete("authorId");
-        params.set("page", 1);
+        params.set("page", "1");
         setAuthorId("");
         setQ("");
         replace(`${pathname}?${params.toString()}`);

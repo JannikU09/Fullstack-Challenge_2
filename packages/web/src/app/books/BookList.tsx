@@ -61,7 +61,11 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            <Button
                               variant="danger"
                               type="button"
-                              onClick={() => deleteBookAction(book.Books.id)}
+                              onClick={() => {
+                                 const id = book.Books.id;
+                                 if (id === undefined) return;
+                                 deleteBookAction(id);
+                              }}
                            >
                               <strong>Delete</strong>
                            </Button>
@@ -75,11 +79,13 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        title: book.Books.title,
                                        authorId: book.Books.authorId,
                                        isbn: book.Books.isbn,
-                                       year: book.Books.year,
+                                       year: book.Books.year ?? undefined,
                                     }}
                                     authors={authors}
                                     onSubmit={(_e, data) => {
-                                       updateBookAction(book.Books.id, data);
+                                       const id = book.Books.id;
+                                       if (id === undefined) return;
+                                       updateBookAction(id, data);
                                        setIsOpen(false);
                                     }}
                                     submitLabel="Update"
