@@ -178,3 +178,14 @@ button.paginationCurrent {
   transition: all 0.3s;
   background: lightgray;
 }
+
+button.paginationDisabled {
+  width: 10px;
+  height: 35px;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+  cursor: default;
+}
