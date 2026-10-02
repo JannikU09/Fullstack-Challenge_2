@@ -46,7 +46,7 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     return (
         <div>
             <div className="choosePage">
-                <Pagination page={Number(page)} count={pages.length} />
+                <Pagination page={Number(page)} totalPages={pages.length} itemsNextTo={1} itemsAtStartEnd={4} />
             </div>
             <div style={{ margin: "15px" }} />
             <div className="pageSizeSelect">
