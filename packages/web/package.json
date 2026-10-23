@@ -8,7 +8,8 @@
     "dev": "next dev",
     "lint": "biome check .",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@repo/database": "workspace:*",
@@ -26,6 +27,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "5.0.5",
     "jsdom": "^29.1.1",
     "react": "link: @testing-library/react",
     "typescript": "6.0.2",
