@@ -4,4 +4,5 @@ export interface ButtonProps {
   type?: "button" | "submit";
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: true | false;
+  ariaLabel?: string;
 }
