@@ -45,7 +45,7 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
 
     return (
         <div>
-            <div className="choosePage">
+            <div className="choosePage" data-testid="booksPagination">
                 <Pagination page={Number(page)} totalPages={pages.length} itemsNextTo={1} itemsAtStartEnd={4} />
             </div>
             <div style={{ margin: "15px" }} />
