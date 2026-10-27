@@ -101,16 +101,18 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => goToFirstPage()}
                     disabled={currentPage <= 1}
+                    ariaLabel="FirstPage"
                 >
-                    <FirstPage />
+                    <FirstPage titleAccess="FirstPage" />
                 </Button>
                 <Button
                     type="button"
                     variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => decreasePage()}
                     disabled={currentPage <= 1}
+                    ariaLabel="ChevronLeft"
                 >
-                    <ChevronLeft />
+                    <ChevronLeft titleAccess="ChevronLeft" />
                 </Button>
 
                 {paginationPages.map((pageNumber) => {
@@ -155,6 +157,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => increasePage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
+                    ariaLabel="ChevronRight"
                 >
                     <ChevronRight />
                 </Button>
@@ -163,10 +166,11 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => goToLastPage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
+                    ariaLabel="LastPage"
                 >
                     <LastPage />
                 </Button>
             </div>
-        </div>
+        </div >
     );
 };
