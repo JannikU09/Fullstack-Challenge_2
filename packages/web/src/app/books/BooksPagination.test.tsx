@@ -1,22 +1,44 @@
 import { render, screen } from "@testing-library/react";
-import { UserEvent } from "@testing-library/user-event";
+import { userEvent } from "@testing-library/user-event";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BooksPagination } from "./BooksPagination";
 
+const replaceMock = vi.fn();
+
 vi.mock("next/navigation", () => ({
-    useRouter: () => ({
-        replace: vi.fn(),
-        push: vi.fn(),
-    }),
-    usePathname: () => "/books",
-    useSearchParams: () => new URLSearchParams(),
-}))
+    useRouter: vi.fn(),
+    usePathname: vi.fn(),
+    useSearchParams: vi.fn(),
+}));
+
+beforeEach(() => {
+    replaceMock.mockClear();
+    vi.mocked(useRouter).mockReturnValue({ replace: replaceMock, push: vi.fn() } as any);
+    vi.mocked(usePathname).mockReturnValue("/books");
+});
+
+function renderPagination(totalPages: number, page: number) {
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(`page=${page}}`) as any);
+    return render(<BooksPagination totalPages={totalPages} />);
+}
 
 describe("BooksPagination", () => {
     it("prüft ob die BooksPaginaion rendert.", async () => {
-        render(<BooksPagination totalPages={30} />);
+        renderPagination(15, 1);
         const paginationTest = screen.getByTestId("booksPagination");
         expect(paginationTest).toBeInTheDocument();
+    });
+
+    it("prüft handlePageSize()", async () => {
+        const user = userEvent.setup();
+        renderPagination(15, 1);
+
+        const combobox = screen.getByRole("combobox", { name: /pageSizeSelect/i });
+        await user.click(combobox);
+        const option = screen.getByRole("option", { name: "5" });
+        await user.click(option);
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("pageSize=5"));
     });
 });

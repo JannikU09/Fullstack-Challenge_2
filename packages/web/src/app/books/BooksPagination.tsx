@@ -56,6 +56,7 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
                         value={pageSize}
                         label="Page Size"
                         onChange={(event) => handlePageSize(event.target.value)}
+                        aria-label="PageSizeSelect"
                     >
                         {pageSizeValue.map((size) => (
                             <MenuItem key={size} value={size}>
@@ -65,6 +66,6 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
                     </Select>
                 </FormControl>
             </div>
-        </div>
+        </div >
     );
 };
