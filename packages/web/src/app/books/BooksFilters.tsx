@@ -72,6 +72,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
                 onChange={(event) => handleSearch(event.target.value)}
                 autoComplete="off"
                 value={q}
+                aria-label="Search"
             />
             <div style={{ margin: "auto 5px" }} />
             <FormControl fullWidth>
@@ -80,6 +81,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
                     onChange={(event) => handleAuhorIdChange(event.target.value)}
                     label="Author"
                     value={authorId}
+                    aria-label="Author"
                 >
                     {authors.map((author) => (
                         <MenuItem key={author.id} value={author.id}>
@@ -90,7 +92,12 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
             </FormControl>
 
             <div className="searchButton">
-                <Button variant="primary" type="button" onClick={() => resetSearch()}>
+                <Button
+                    variant="primary"
+                    type="button"
+                    onClick={() => resetSearch()}
+                    ariaLabel="Reset"
+                >
                     <strong>Reset</strong>
                 </Button>
             </div>
