@@ -44,6 +44,7 @@ export function BookForm({
             value={authorId}
             onChange={(event) => setAuthorId(event.target.value)}
             label="Author"
+            aria-label="Author"
           >
             {authors.map((author) => (
               <MenuItem key={author.id} value={author.id}>
