@@ -1,14 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
-// import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Button } from "../../componentes/ui/Button";
-import { authorTestList, bookTestList } from "../../lib/bookTestList";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as actions from "./actions";
-import { BooksPagination } from "./BooksPagination";
 import BooksPage from "./page";
-
-const books = bookTestList;
 
 const replaceMock = vi.fn();
 
