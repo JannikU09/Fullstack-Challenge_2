@@ -1,22 +1,11 @@
-// import { authors, books, db } from "@repo/database";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Author } from "../interfaces/Author";
+import { authorTestList } from "../../lib/bookTestList";
 import { BooksFilters } from "./BooksFilters";
 
-// vi.mock("@repo/database", () => ({
-//     authors: {
-//         id: "authors.id",
-//         name: "authors.name",
-//     },
-// }));
-
-const authors: Author[] = [
-    { id: 1, name: "Autor A" },
-    { id: 2, name: "Autor B" },
-];
+const authors = authorTestList;
 
 const replaceMock = vi.fn();
 
@@ -34,9 +23,7 @@ beforeEach(() => {
 
 function renderFilter(initialParams: string = "") {
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(initialParams) as any);
-    return render(
-        <BooksFilters authors={authors} total={7} totalWithoutFilter={30} />
-    );
+    return render(<BooksFilters authors={authors} total={7} totalWithoutFilter={30} />);
 };
 
 describe("BooksFilters", () => {
