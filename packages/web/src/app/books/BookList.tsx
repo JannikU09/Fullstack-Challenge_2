@@ -40,7 +40,10 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                books.map((book) => (
                   <div key={book.Books.id} className="book">
                      <Accordion>
-                        <AccordionSummary aria-controls="panel1-content">
+                        <AccordionSummary
+                           aria-controls="panel1-content"
+                           aria-label={`Accordion_${book.Books.id}`}
+                        >
                            <Typography component={"span"}>
                               <h4>{book.Books.title}</h4>
                            </Typography>
@@ -55,7 +58,12 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            <p hidden={!book.Books.year}>
                               <strong>Year: </strong> {book.Books.year}
                            </p>
-                           <Button variant="primary" type="button" onClick={() => setIsOpen(!isOpen)}>
+                           <Button
+                              variant="primary"
+                              type="button"
+                              onClick={() => setIsOpen(!isOpen)}
+                              ariaLabel="Edit"
+                           >
                               <strong>Edit</strong>
                            </Button>
                            <Button
@@ -66,6 +74,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                  if (id === undefined) return;
                                  deleteBookAction(id);
                               }}
+                              ariaLabel="Delete"
                            >
                               <strong>Delete</strong>
                            </Button>
@@ -107,6 +116,6 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                submitLabel="Add"
             />
          </div>
-      </div>
+      </div >
    );
 };
