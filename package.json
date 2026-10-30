@@ -1,7 +1,7 @@
 {
   "name": "fullstack-challenge",
   "private": true,
-  "packageManager": "pnpm@12.4.1",
+  "packageManager": "pnpm@12.15.0",
   "scripts": {
     "build": "pnpm --filter @repo/web build",
     "db:start": "docker compose up -d",
@@ -14,11 +14,13 @@
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "web_test": "pnpm --filter @repo/web test",
+    "coverage": "pnpm --filter @repo/web coverage",
     "table_push": "pnpm --filter @repo/database db:push"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
     "@types/pg": "8.15.4",
+    "@vitest/ui": "^5.0.5",
     "drizzle-kit": "0.31.1",
     "typescript": "^6.0.3"
   },

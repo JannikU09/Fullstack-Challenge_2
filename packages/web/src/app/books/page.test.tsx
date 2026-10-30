@@ -1,84 +1,69 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { authorTestList, bookTestList } from "../../lib/bookTestList";
+import * as actions from "./actions";
 import BooksPage from "./page";
 
+const replaceMock = vi.fn();
+
+vi.mock("./actions");
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+    push: vi.fn(),
+  }),
+  usePathname: () => "/books",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 beforeEach(() => {
-  global.fetch = vi.fn((url) => {
-
-    // if (String(url).includes("/api/authors")) {
-    //   console.log("oben", String(url));
-    //   return Promise.resolve(
-    //     new Response(
-    //       JSON.stringify({
-    //         data: authorTestList,
-    //       }),
-    //       { status: 200 }
-    //     ),
-    //   );
-    // }
-
-    if (String(url).includes("/api/books")) {
-      console.log("unten", String(url));
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({
-            data: bookTestList,
-            total: 1,
-          }),
-          { status: 200 }
-        ),
-      );
-    }
-
-    return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
-  }) as typeof fetch;
+  replaceMock.mockClear();
 });
 
 describe("BooksPage", () => {
-  it("zeigt Bücher aus der API an", async () => {
-    render(<BooksPage />);
+  it("zeigt Buch an", async () => {
+    vi.mocked(actions.getBooks).mockResolvedValue({
+      data: [
+        {
+          Author: { name: "Jannik", id: 1 },
+          Books: { id: 1, title: "Test-Buch", authorId: 1, isbn: "9784845344974", year: 2026 },
+        },
+      ],
+      total: 1,
+      totalPages: 1,
+      totalWithoutFilter: 1,
+    });
+    vi.mocked(actions.getAuthors).mockResolvedValue([{ id: 1, name: "Jannik" }]);
+    const jsx = await BooksPage({
+      searchParams: Promise.resolve({ q: "", authorId: 1, page: 1, pageSize: 20 }),
+    });
+    render(jsx);
     expect(await screen.findByText("Test-Buch")).toBeInTheDocument();
+    expect(await screen.findByText("1 Buch")).toBeInTheDocument();
   });
-});
 
-describe("POST-Test", () => {
-  it("ruft fetch mit POST auf", async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    fetchSpy
-      .mockResolvedValueOnce(new Response(JSON.stringify({ data: authorTestList }), { status: 200 }))
-      // .mockResolvedValueOnce(new Response(JSON.stringify({ data: bookTestList, total: 1 }), { status: 200 }))
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({
-          success: true,
-          data: {
-            title: "Neues Buch",
-            authorId: 1,
-            isbn: "234523462546245",
-            year: 2026
-          },
-        }),
-          { status: 200 }
-        )
-      );
-
-    console.log("authorTestList", authorTestList);
-    console.log("isArray", Array.isArray(authorTestList));
-
-
-    render(<BooksPage />);
-
-    const titleInput = await screen.findByLabelText("Title");
-
-    const user = userEvent.setup();
-    await user.type(titleInput, "Neues Buch");
-    await user.click(screen.getByRole("button", { name: "Add" }));
-
-    expect(fetchSpy).toHaveBeenCalled()
-    expect(fetchSpy).toHaveBeenCalledWith(
-      expect.stringContaining("/api/books"),
-      expect.objectContaining({ method: "POST" })
-    );
+  it("Zeigt Bücher an", async () => {
+    vi.mocked(actions.getBooks).mockResolvedValue({
+      data: [
+        {
+          Author: { name: "Jannik", id: 1 },
+          Books: { id: 1, title: "Test-Buch", authorId: 1, isbn: "9784845344974", year: 2026 },
+        },
+        {
+          Author: { name: "Jannik", id: 1 },
+          Books: { id: 2, title: "Harry", authorId: 1, isbn: "9876543210123", year: 2024 },
+        },
+      ],
+      total: 2,
+      totalPages: 1,
+      totalWithoutFilter: 2,
+    });
+    vi.mocked(actions.getAuthors).mockResolvedValue([{ id: 1, name: "Jannik" }]);
+    const jsx = await BooksPage({
+      searchParams: Promise.resolve({ q: "", authorId: 1, page: 1, pageSize: 20 }),
+    });
+    render(jsx);
+    expect(await screen.findByText("Test-Buch")).toBeInTheDocument();
+    expect(await screen.findByText("Harry")).toBeInTheDocument();
+    expect(await screen.findByText("2 Bücher")).toBeInTheDocument();
   });
 });
