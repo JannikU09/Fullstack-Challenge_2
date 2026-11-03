@@ -16,9 +16,7 @@ const schema = z.object({
 });
 
 export async function getBooks(params: BookSearchParams) {
-    const offset: number = (params.page - 1) * params.pageSize;
     const filters = [];
-
 
     if (params.q) {
         filters.push(ilike(books.title, `%${params.q}%`));
@@ -32,6 +30,8 @@ export async function getBooks(params: BookSearchParams) {
     if (!params.pageSize) {
         params.pageSize = 20;
     }
+
+    const offset: number = (params.page - 1) * params.pageSize;
 
     const isFilter = filters.length ? and(...filters) : undefined;
 
