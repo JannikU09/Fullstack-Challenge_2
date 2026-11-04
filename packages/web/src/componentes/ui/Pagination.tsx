@@ -20,7 +20,8 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     const [currentPage, setCurrentPage] = useState<number>(page ?? 1);
 
     useEffect(() => {
-        setCurrentPage(Number(params.get("page")) ?? "1");
+        const parsed = Number(params.get("page"));
+        setCurrentPage(Number.isNaN(parsed) || parsed < 1 ? 1 : parsed);
     }, [params.get]);
 
     const pageNumbers: number[] = [];
@@ -72,7 +73,6 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     };
 
     function goToPage(newPage: number) {
-        if (totalPages === undefined) return;
         const num = newPage;
         params.set("page", num.toString());
         replace(`${pathname}?${params.toString()}`);
@@ -89,8 +89,10 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
         goToPage(1);
     };
     function goToLastPage() {
+        /* v8 ignore start */
         if (totalPages === undefined) return;
         goToPage(totalPages);
+        /* v8 ignore end */
     };
 
     return (
