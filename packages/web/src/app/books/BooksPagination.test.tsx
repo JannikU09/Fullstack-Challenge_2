@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import { atom } from "jotai";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { pageSizeAtom, pageSizeValueAtom } from "../../componentes/utils/atoms";
 import { BooksPagination } from "./BooksPagination";
 
 const replaceMock = vi.fn();
@@ -12,6 +14,10 @@ vi.mock("next/navigation", () => ({
     useSearchParams: vi.fn(),
 }));
 
+vi.mock("../../componentes/utils/atoms", () => ({
+    pageSizeValueAtom: atom(["", 5, 20, 50, 75, 100]),
+}));
+
 beforeEach(() => {
     replaceMock.mockClear();
     vi.mocked(useRouter).mockReturnValue({ replace: replaceMock, push: vi.fn() } as any);
@@ -19,7 +25,7 @@ beforeEach(() => {
 });
 
 function renderPagination(totalPages: number, page: number) {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(`page=${page}}`) as any);
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(`page=${page}`) as any);
     return render(<BooksPagination totalPages={totalPages} />);
 }
 
@@ -40,5 +46,17 @@ describe("BooksPagination", () => {
         await user.click(option);
 
         expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("pageSize=5"));
+    });
+
+    it("setzt pageSize auf 20, wenn ein leerer Wert übergeben wird.", async () => {
+        const user = userEvent.setup();
+        renderPagination(15, 1);
+
+        const combobox = screen.getByRole("combobox", { name: /pageSizeSelect/i });
+        await user.click(combobox);
+        const option = screen.getByRole("option", { name: "" });
+        await user.click(option);
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("pageSize=20"));
     });
 });

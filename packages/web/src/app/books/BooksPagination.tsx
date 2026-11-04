@@ -33,10 +33,12 @@ export const BooksPagination = ({ totalPages }: BooksPaginationProps) => {
     function handlePageSize(pageSizeNow: string) {
         if (pageSizeNow) {
             params.set("page", "1");
+            setPage("1");
             params.set("pageSize", pageSizeNow);
             setPageSize(pageSizeNow);
-            setPage("1");
         } else {
+            params.set("page", "1");
+            setPage("1");
             params.set("pageSize", "20");
             setPageSize("20");
         }
