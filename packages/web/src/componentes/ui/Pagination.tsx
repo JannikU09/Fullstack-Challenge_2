@@ -20,7 +20,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     const [currentPage, setCurrentPage] = useState<number>(page ?? 1);
 
     useEffect(() => {
-        setCurrentPage(Number(params.get("page")) ?? 1);
+        setCurrentPage(Number(params.get("page")) ?? "1");
     }, [params.get]);
 
     const pageNumbers: number[] = [];

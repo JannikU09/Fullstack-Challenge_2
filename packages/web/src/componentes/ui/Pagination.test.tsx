@@ -76,4 +76,34 @@ describe("Pagination", () => {
 
         expect(replaceMock).toHaveBeenCalledWith("/books?page=20");
     });
+
+    it("klickt auf linke Dots", async () => {
+        const user = userEvent.setup();
+        renderPagination(10, 20);
+
+        const dotsButtons = screen.getAllByText("...");
+        await user.click(dotsButtons[0]);
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("page=6"));
+    });
+
+    it("klickt auf rechte Dots", async () => {
+        const user = userEvent.setup();
+        renderPagination(10, 20);
+
+        const dotsButtons = screen.getAllByText("...");
+        await user.click(dotsButtons[1]);
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("page=14"));
+    });
+
+    it("klickt auf eine normale Page", async () => {
+        const user = userEvent.setup();
+        renderPagination(10, 20);
+
+        const pageButton = screen.getByRole("button", { name: /9/i });
+        await user.click(pageButton);
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("page=9"));
+    });
 });
