@@ -17,7 +17,7 @@ type BookListProps = {
 };
 
 export const BookList = ({ books, authors, total }: BookListProps) => {
-   const [isOpen, setIsOpen] = useState(false);
+   const [openBookId, setOpenBookId] = useState<number | undefined>(undefined);
 
    useEffect(() => {
       total === 1 ?
@@ -61,7 +61,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            <Button
                               variant="primary"
                               type="button"
-                              onClick={() => setIsOpen(!isOpen)}
+                              onClick={() => setOpenBookId(openBookId === book.Books.id ? undefined : book.Books.id)}
                               ariaLabel="Edit"
                            >
                               <strong>Edit</strong>
@@ -80,7 +80,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            </Button>
 
                            {/* Update FormFields */}
-                           <div className="updateForm" hidden={!isOpen}>
+                           <div className="updateForm" hidden={openBookId !== book.Books.id}>
                               <div className="updateFormField">
                                  <BookForm
                                     initialValues={{
@@ -95,7 +95,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        const id = book.Books.id;
                                        if (id === undefined) return;
                                        updateBookAction(id, data);
-                                       setIsOpen(false);
+                                       setOpenBookId(openBookId === book.Books.id ? undefined : book.Books.id);
                                     }}
                                     submitLabel="Update"
                                  />
