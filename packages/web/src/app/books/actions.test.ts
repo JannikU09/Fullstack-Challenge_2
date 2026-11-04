@@ -153,6 +153,14 @@ describe("actions", () => {
         expect(result.error).toBe("Validation Error");
     });
 
+    it("falls updateBookAction fehlschlägt.", async () => {
+        (db.update as any).mockReturnValue(createChain([]));
+
+        const result = await updateBookAction(99999, bookTestList[1]);
+
+        expect(result.success).not.toBe(true);
+    })
+
     it("deleteBookAction, löscht ein Buch", async () => {
         (db.delete as any).mockReturnValue(createChain([bookTestList[0].Books]));
 
@@ -162,12 +170,10 @@ describe("actions", () => {
     });
 
     it("deleteBookAction, wenn die id falsch ist", async () => {
-        (db.delete as any).mockImplementation(() => {
-            throw new Error();
-        });
+        (db.delete as any).mockReturnValue(createChain([]));
 
         const result = await deleteBookAction(-2);
 
-        expect(result.success).toBe(false);
+        expect(result.success).not.toBe(true);
     });
 });

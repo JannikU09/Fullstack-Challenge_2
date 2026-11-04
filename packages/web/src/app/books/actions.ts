@@ -24,10 +24,10 @@ export async function getBooks(params: BookSearchParams) {
     if (params.authorId) {
         filters.push(eq(books.authorId, Number(params.authorId)));
     }
-    if (!params.page) {
+    if (!params.page || params.page <= 0) {
         params.page = 1;
     }
-    if (!params.pageSize) {
+    if (!params.pageSize || params.pageSize <= 0) {
         params.pageSize = 20;
     }
 
@@ -90,17 +90,21 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
         return { success: false, error: "Validation Error" };
     }
 
-    await db.update(books).set(result.data).where(eq(books.id, id)).returning();
+    const updated = await db.update(books).set(result.data).where(eq(books.id, id)).returning();
+    if (updated.length === 0) {
+        return { success: false, error: "Buch nicht gefunden." };
+    };
+
     revalidatePath("/books");
     return { success: true };
 }
 
 export async function deleteBookAction(id: number) {
-    try {
-        await db.delete(books).where(eq(books.id, id)).returning();
-        revalidatePath("/books");
-        return { success: true, message: "Erfolgreich gelöscht" };
-    } catch (error) {
-        return { success: false, error: error };
+
+    const deleted = await db.delete(books).where(eq(books.id, id)).returning();
+    if (deleted.length === 0) {
+        return { success: false, error: "Buch nicht gefunden" };
     }
+    revalidatePath("/books");
+    return { success: true, message: "Erfolgreich gelöscht" };
 }
