@@ -95,7 +95,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        const id = book.Books.id;
                                        if (id === undefined) return;
                                        updateBookAction(id, data);
-                                       setOpenBookId(openBookId === book.Books.id ? undefined : book.Books.id);
+                                       setOpenBookId(undefined);
                                     }}
                                     submitLabel="Update"
                                  />

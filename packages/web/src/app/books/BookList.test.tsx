@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { usePathname, useRouter } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -57,6 +57,19 @@ describe("BookList", () => {
         expect(editButton).toBeInTheDocument();
     });
 
+    it("schließt das Formular wieder, wenn Edit zweimal geklickt wird", async () => {
+        const user = userEvent.setup();
+        renderBookList();
+        await user.click(screen.getByRole("button", { name: /accordion_2/i }));
+        const editButton = screen.getByRole("button", { name: /edit/i });
+        await user.click(editButton);
+        const updateButton = screen.getByRole("button", { name: /update/i });
+        expect(updateButton).toBeVisible();
+
+        await user.click(editButton);
+        expect(updateButton).not.toBeVisible();
+    });
+
     it("drückt den Delete-Button", async () => {
         const user = userEvent.setup();
         renderBookList();
@@ -67,6 +80,7 @@ describe("BookList", () => {
         const deleteButton = screen.getByRole("button", { name: /delete/i });
         expect(deleteButton).toBeInTheDocument();
         await user.click(deleteButton);
+        expect(deleteBookAction).toHaveBeenCalledOnce();
     });
 
     it("drückt den Update-Button", async () => {
@@ -82,6 +96,7 @@ describe("BookList", () => {
         const updateButton = screen.getByRole("button", { name: /update/i });
         await user.click(updateButton);
         expect(updateButton).toBeInTheDocument();
+        expect(updateBookAction).toHaveBeenCalledOnce();
     });
 
     it("drückt den Add-Button", async () => {
@@ -91,9 +106,10 @@ describe("BookList", () => {
         const addButton = screen.getByRole("button", { name: /add/i });
         await user.click(addButton);
         expect(addButton).toBeInTheDocument();
+        expect(createBookAction).toHaveBeenCalledOnce();
     });
 
-    it("prüft falls id undefined ist.", async () => {
+    it("ruft deleteBookAction nicht auf, falls die Book.id undefined ist.", async () => {
         const user = userEvent.setup();
         const bookWithoutId = {
             Books: { id: undefined, title: "Test", authorId: 1, isbn: "1234567890123", year: 2026 },
@@ -107,5 +123,42 @@ describe("BookList", () => {
         await user.click(deleteButton);
 
         expect(deleteBookAction).not.toHaveBeenCalled();
+    });
+
+    it("ruft updateBookAction nicht auf, falls die Book.id undefined ist.", async () => {
+        const user = userEvent.setup();
+        const bookWithoutId = {
+            Books: { id: undefined, title: "Test", authorId: 1, isbn: "1234567890123", year: 2026 },
+            Author: { id: 1, name: "Autor A" },
+        };
+        renderBookList(1, [bookWithoutId]);
+
+        const accordion = screen.getByRole("button", { name: /accordion_undefined/i });
+        await user.click(accordion);
+        const editButton = screen.getByRole("button", { name: /edit/i });
+        await user.click(editButton);
+        const updateButton = screen.getByRole("button", { name: /update/i });
+        await user.click(updateButton);
+
+        expect(updateBookAction).not.toHaveBeenCalled();
+    });
+
+    it("öffnet den Editor für ein Buch ohne year", async () => {
+        const user = userEvent.setup();
+        const bookWithoutYear = {
+            Books: { id: 5, title: "Ohne Jahr", authorId: 1, isbn: "5135614352614", year: undefined },
+            Author: { id: 1, name: "Autor A" },
+        };
+        renderBookList(1, [bookWithoutYear]);
+
+        const accordionButton = screen.getByRole("button", { name: /accordion_5/i });
+        await user.click(accordionButton);
+
+        const bookContainer = accordionButton.closest(".book") as HTMLElement;
+        const editButton = within(bookContainer).getByRole("button", { name: /edit/i });
+        await user.click(editButton);
+
+        const yearTextbox = within(bookContainer).getByRole("textbox", { name: /year/i });
+        expect(yearTextbox).toHaveValue("");
     });
 });
