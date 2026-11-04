@@ -6,10 +6,10 @@ import { authorTestList } from "../../lib/bookTestList";
 import { BookForm } from "./BookForm";
 
 const initialValuess: BookInitialValues = {
-    title: undefined,
-    authorId: undefined,
-    isbn: undefined,
-    year: undefined,
+    title: "Guten Morgen",
+    authorId: 2,
+    isbn: "7864521596483",
+    year: 2025,
 };
 
 const replaceMock = vi.fn();
@@ -24,7 +24,7 @@ beforeEach(() => {
     replaceMock.mockClear();
 });
 
-function renderBookForm(initialValues_1: BookInitialValues = initialValuess ?? undefined) {
+function renderBookForm(initialValues_1?: BookInitialValues) {
     return render(<BookForm authors={authorTestList} initialValues={initialValues_1} />);
 }
 
@@ -70,4 +70,57 @@ describe("BookForm", () => {
 
         expect(yearTextbox).toHaveValue("2026");
     });
+
+    it("ruft onSubmit ohne initialValues auf.", async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Add" />);
+
+        await user.type(screen.getByRole("textbox", { name: /title/i }), "Harry");
+        await user.click(screen.getByRole("combobox", { name: /author/i }));
+        await user.click(screen.getByRole("option", { name: "Autor A" }));
+        await user.type(screen.getByRole("textbox", { name: /isbn/i }), "1234567890123");
+        await user.type(screen.getByRole("textbox", { name: /year/i }), "2025");
+
+        await user.click(screen.getByRole("button", { name: /add/i }));
+
+        expect(onSubmit).toHaveBeenCalledWith(expect.anything(), {
+            Books: { id: undefined, title: "Harry", authorId: 1, isbn: "1234567890123", year: 2025 },
+            Author: { id: 1, name: "" },
+        });
+
+        expect(screen.getByRole("textbox", { name: /title/i })).toHaveValue("");
+    });
+
+    it("ruft onSubmit mit initialValues auf.", async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Add" initialValues={initialValuess} />);
+
+
+        const titleTextbox = screen.getByRole("textbox", { name: /title/i });
+        await user.clear(titleTextbox);
+        await user.type(titleTextbox, "Harry");
+
+        const authorSelect = screen.getByRole("combobox", { name: /author/i });
+        await user.click(authorSelect);
+        await user.click(screen.getByRole("option", { name: "Autor A" }));
+
+        const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
+        await user.clear(isbnTextbox);
+        await user.type(isbnTextbox, "1234567890123");
+
+        const yearTextbox = screen.getByRole("textbox", { name: /year/i });
+        await user.clear(yearTextbox);
+        await user.type(yearTextbox, "2025");
+
+        await user.click(screen.getByRole("button", { name: /add/i }));
+
+        expect(onSubmit).toHaveBeenCalledWith(expect.anything(), {
+            Books: { id: undefined, title: "Harry", authorId: 1, isbn: "1234567890123", year: 2025 },
+            Author: { id: 1, name: "" },
+        });
+
+        expect(screen.getByRole("textbox", { name: /title/i })).toHaveValue("Harry");
+    })
 });
