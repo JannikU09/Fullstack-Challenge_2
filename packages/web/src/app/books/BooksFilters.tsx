@@ -84,6 +84,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
                     value={authorId}
                     aria-label="Author"
                 >
+                    <MenuItem value="">Alle Autoren</MenuItem>
                     {authors.map((author) => (
                         <MenuItem key={author.id} value={author.id}>
                             {author.name}

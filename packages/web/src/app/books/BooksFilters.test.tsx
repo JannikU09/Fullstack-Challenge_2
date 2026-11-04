@@ -80,4 +80,13 @@ describe("BooksFilters", () => {
         expect(textbox).toHaveValue("");
         expect(replaceMock).toHaveBeenCalledWith("/books?");
     });
+
+    it("entfernt den Autorfilter", async () => {
+        const user = userEvent.setup();
+        renderFilter("q=harry&authorId=1");
+        await user.click(screen.getByRole("combobox", { name: /author/i }));
+        await user.click(screen.getByRole("option", { name: /alle autoren/i }));
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("q=harry"));
+        expect(replaceMock).toHaveBeenCalledWith(expect.not.stringContaining("authorId"));
+    });
 });
