@@ -47,6 +47,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
             setAuthorId(id);
         } else {
             params.delete("authorId");
+            setAuthorId("");
         }
         replace(`${pathname}?${params.toString()}`);
     }
