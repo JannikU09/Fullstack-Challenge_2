@@ -13,6 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
+    vi.clearAllMocks()
     replaceMock.mockClear();
     vi.mocked(useRouter).mockReturnValue({ replace: replaceMock, push: vi.fn() } as any);
     vi.mocked(usePathname).mockReturnValue("/books");
@@ -113,11 +114,6 @@ describe("Pagination", () => {
         expect(screen.getByRole("button", { name: /FirstPage/i })).toBeDisabled();
     });
 
-    it("andere itemsAtStartEnd und itemsNextTo", async () => {
-        vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams() as any);
-        render(<Pagination totalPages={10} page={1} itemsAtStartEnd={3} itemsNextTo={1} />);
-    });
-
     it("Pagination - start/end Berechnung im else - currentPage knapp über itemsAtStartEnd", async () => {
         vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(`page=2`) as any);
         render(<Pagination totalPages={20} page={2} itemsAtStartEnd={1} itemsNextTo={3} />);
@@ -137,4 +133,48 @@ describe("Pagination", () => {
         expect(screen.getByRole("button", { name: "20" })).toBeInTheDocument();
         expect(screen.queryByRole("button", { name: "14" })).not.toBeInTheDocument();
     });
+
+    it.each([
+        { page: 1, expected: ["1", "2", "3", "4", "5", "...", "10"] },
+        { page: 3, expected: ["1", "2", "3", "4", "5", "...", "10"] },
+        { page: 4, expected: ["1", "2", "3", "4", "5", "...", "10"] },
+        { page: 5, expected: ["1", "...", "4", "5", "6", "...", "10"] },
+        { page: 7, expected: ["1", "...", "6", "7", "8", "9", "10"] },
+        { page: 8, expected: ["1", "...", "6", "7", "8", "9", "10"] },
+        { page: 10, expected: ["1", "...", "6", "7", "8", "9", "10"] },
+
+    ])(
+        "zeigt bei page=$page (total=10, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages",
+        ({ page, expected }) => {
+            renderPagination(page, 10);
+
+            const labels = screen
+                .getAllByRole("button")
+                .map((b) => b.textContent ?? "")
+                .filter((t) => /^(\d+|\.\.\.)$/.test(t));
+
+            expect(labels).toEqual(expected);
+        },
+    );
+
+    it.each([
+        { page: 0, expected: ["1", "2", "3", "4", "5", "...", "44"] },
+        { page: 1, expected: ["1", "2", "3", "4", "5", "...", "44"] },
+        { page: 15, expected: ["1", "...", "14", "15", "16", "...", "44"] },
+        { page: 44, expected: ["1", "...", "40", "41", "42", "43", "44"] },
+    ])(
+        "zeigt bei page=$page (total=44, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages",
+        ({ page, expected }) => {
+            renderPagination(page, 44);
+
+            const labels = screen
+                .getAllByRole("button")
+                .map((b) => b.textContent ?? "")
+                .filter((t) => /^(\d+|\.\.\.)$/.test(t));
+
+            console.log(labels);
+
+            expect(labels).toEqual(expected);
+        },
+    );
 });
