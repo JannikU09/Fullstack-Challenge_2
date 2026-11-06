@@ -31,22 +31,25 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
     function handleSearch(term: string) {
         if (term) {
             params.set("q", term);
-            params.set("page", 1);
+            params.set("page", "1");
             setQ(term);
         } else {
             params.delete("q");
+            params.set("page", "1");
             setQ("");
         }
         replace(`${pathname}?${params.toString()}`);
     }
 
-    function handleAuhorIdChange(id: number) {
+    function handleAuhorIdChange(id: string) {
         if (id) {
             params.set("authorId", id);
-            params.set("page", 1);
+            params.set("page", "1");
             setAuthorId(id);
         } else {
             params.delete("authorId");
+            params.set("page", "1");
+            setAuthorId("");
         }
         replace(`${pathname}?${params.toString()}`);
     }
@@ -54,7 +57,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
     function resetSearch() {
         params.delete("q");
         params.delete("authorId");
-        params.set("page", 1);
+        params.set("page", "1");
         setAuthorId("");
         setQ("");
         replace(`${pathname}?${params.toString()}`);
@@ -72,6 +75,7 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
                 onChange={(event) => handleSearch(event.target.value)}
                 autoComplete="off"
                 value={q}
+                aria-label="Search"
             />
             <div style={{ margin: "auto 5px" }} />
             <FormControl fullWidth>
@@ -80,7 +84,9 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
                     onChange={(event) => handleAuhorIdChange(event.target.value)}
                     label="Author"
                     value={authorId}
+                    aria-label="Author"
                 >
+                    <MenuItem value="">Alle Autoren</MenuItem>
                     {authors.map((author) => (
                         <MenuItem key={author.id} value={author.id}>
                             {author.name}
@@ -90,7 +96,12 @@ export const BooksFilters = ({ authors, total, totalWithoutFilter }: BooksFilter
             </FormControl>
 
             <div className="searchButton">
-                <Button variant="primary" type="button" onClick={() => resetSearch()}>
+                <Button
+                    variant="primary"
+                    type="button"
+                    onClick={() => resetSearch()}
+                    ariaLabel="Reset"
+                >
                     <strong>Reset</strong>
                 </Button>
             </div>

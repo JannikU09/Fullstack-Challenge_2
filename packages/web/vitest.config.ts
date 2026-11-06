@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
@@ -6,5 +6,13 @@ export default defineConfig({
     test: {
         environment: "jsdom",
         setupFiles: ["./vitest.setup.ts"],
+        clearMocks: true,
+        coverage: {
+            enabled: true,
+            provider: 'v8',
+            clean: true,
+            cleanOnRerun: true
+        },
+        reporters: ['html', ...configDefaults.reporters]
     },
 });

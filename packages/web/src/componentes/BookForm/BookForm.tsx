@@ -44,6 +44,7 @@ export function BookForm({
             value={authorId}
             onChange={(event) => setAuthorId(event.target.value)}
             label="Author"
+            aria-label="Author"
           >
             {authors.map((author) => (
               <MenuItem key={author.id} value={author.id}>
@@ -88,6 +89,10 @@ export function BookForm({
                   isbn: isbn,
                   year: year === "" ? undefined : Number(year),
                 },
+                Author: {
+                  id: Number(authorId),
+                  name: "",
+                }
               });
             handleEmptyFields();
           }}

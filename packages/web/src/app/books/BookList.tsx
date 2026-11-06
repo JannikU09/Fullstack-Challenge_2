@@ -17,7 +17,7 @@ type BookListProps = {
 };
 
 export const BookList = ({ books, authors, total }: BookListProps) => {
-   const [isOpen, setIsOpen] = useState(false);
+   const [openBookId, setOpenBookId] = useState<number | undefined>(undefined);
 
    useEffect(() => {
       total === 1 ?
@@ -40,7 +40,10 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                books.map((book) => (
                   <div key={book.Books.id} className="book">
                      <Accordion>
-                        <AccordionSummary aria-controls="panel1-content">
+                        <AccordionSummary
+                           aria-controls="panel1-content"
+                           aria-label={`Accordion_${book.Books.id}`}
+                        >
                            <Typography component={"span"}>
                               <h4>{book.Books.title}</h4>
                            </Typography>
@@ -55,19 +58,29 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            <p hidden={!book.Books.year}>
                               <strong>Year: </strong> {book.Books.year}
                            </p>
-                           <Button variant="primary" type="button" onClick={() => setIsOpen(!isOpen)}>
+                           <Button
+                              variant="primary"
+                              type="button"
+                              onClick={() => setOpenBookId(openBookId === book.Books.id ? undefined : book.Books.id)}
+                              ariaLabel="Edit"
+                           >
                               <strong>Edit</strong>
                            </Button>
                            <Button
                               variant="danger"
                               type="button"
-                              onClick={() => deleteBookAction(book.Books.id)}
+                              onClick={() => {
+                                 const id = book.Books.id;
+                                 if (id === undefined) return;
+                                 deleteBookAction(id);
+                              }}
+                              ariaLabel="Delete"
                            >
                               <strong>Delete</strong>
                            </Button>
 
                            {/* Update FormFields */}
-                           <div className="updateForm" hidden={!isOpen}>
+                           <div className="updateForm" hidden={openBookId !== book.Books.id}>
                               <div className="updateFormField">
                                  <BookForm
                                     initialValues={{
@@ -75,12 +88,14 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        title: book.Books.title,
                                        authorId: book.Books.authorId,
                                        isbn: book.Books.isbn,
-                                       year: book.Books.year,
+                                       year: book.Books.year ?? undefined,
                                     }}
                                     authors={authors}
                                     onSubmit={(_e, data) => {
-                                       updateBookAction(book.Books.id, data);
-                                       setIsOpen(false);
+                                       const id = book.Books.id;
+                                       if (id === undefined) return;
+                                       updateBookAction(id, data);
+                                       setOpenBookId(undefined);
                                     }}
                                     submitLabel="Update"
                                  />
@@ -101,6 +116,6 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                submitLabel="Add"
             />
          </div>
-      </div>
+      </div >
    );
 };

@@ -8,7 +8,8 @@
     "dev": "next dev",
     "lint": "biome check .",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@repo/database": "workspace:*",
@@ -16,7 +17,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "swagger-ui-react": "5.32.2",
-    "zod": "^4.3.6"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -25,10 +26,12 @@
     "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "^6.0.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/coverage-v8": "5.0.5",
     "jsdom": "^29.1.1",
     "react": "link: @testing-library/react",
     "typescript": "6.0.2",
-    "vitest": "^4.1.9"
+    "vite": "^7.3.7",
+    "vitest": "5.0.5"
   }
 }
