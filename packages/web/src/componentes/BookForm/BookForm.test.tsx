@@ -21,6 +21,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
+    vi.clearAllMocks();
     replaceMock.mockClear();
 });
 
@@ -95,7 +96,7 @@ describe("BookForm", () => {
     it("ruft onSubmit mit initialValues auf.", async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn();
-        render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Add" initialValues={initialValuess} />);
+        render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Update" initialValues={initialValuess} />);
 
 
         const titleTextbox = screen.getByRole("textbox", { name: /title/i });
@@ -114,13 +115,55 @@ describe("BookForm", () => {
         await user.clear(yearTextbox);
         await user.type(yearTextbox, "2025");
 
-        await user.click(screen.getByRole("button", { name: /add/i }));
+        await user.click(screen.getByRole("button", { name: /update/i }));
 
         expect(onSubmit).toHaveBeenCalledWith(expect.anything(), {
             Books: { id: undefined, title: "Harry", authorId: 1, isbn: "1234567890123", year: 2025 },
             Author: { id: 1, name: "" },
         });
 
-        expect(screen.getByRole("textbox", { name: /title/i })).toHaveValue("Harry");
+        expect(titleTextbox).toHaveValue("Harry");
+        expect(isbnTextbox).toHaveValue("1234567890123");
+        expect(yearTextbox).toHaveValue("2025");
     })
+
+    it("ISBN-Hilfstexte, 12 Zeichen eingetippt", async () => {
+        const user = userEvent.setup();
+        renderBookForm();
+
+        const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
+        await user.type(isbnTextbox, "123456789012");
+
+        expect(screen.getByText("Noch 1 Zeichen")).toBeVisible();
+        expect(screen.getByText(/zu viel/i)).not.toBeVisible();
+    });
+
+    it("ISBN-Hilfstexte, 13 Zeichen eingetippt", async () => {
+        const user = userEvent.setup();
+        renderBookForm();
+
+        const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
+        await user.type(isbnTextbox, "1234567890123");
+
+        expect(screen.getByText(/^Noch \d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText(/zu viel/i)).not.toBeVisible();
+    });
+
+    it("ISBN-Hilftexte, 14 Zeichen eingetippt", async () => {
+        const user = userEvent.setup();
+        renderBookForm();
+
+        const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
+        await user.type(isbnTextbox, "12345678901234");
+
+        expect(screen.getByText(/^Noch -?\d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText("1 Zeichen zu viel!")).toBeVisible();
+    });
+
+    it("ISBN-Hilfstexte, 0 Zeichen eingetippt", async () => {
+        renderBookForm();
+
+        expect(screen.getByText("Noch 13 Zeichen")).toBeVisible();
+        expect(screen.getByText(/zu viel/i)).not.toBeVisible();
+    });
 });
