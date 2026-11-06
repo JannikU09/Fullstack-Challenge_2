@@ -59,6 +59,18 @@ describe("BooksFilters", () => {
         expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("authorId=2"));
     });
 
+    it("Suche mit authorId=0.", async () => {
+        const authorsWithZero = [{ id: 0, name: "Autor Null" }, ...authorTestList];
+        const user = userEvent.setup();
+        vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams() as any);
+        render(<BooksFilters authors={authorsWithZero} total={7} totalWithoutFilter={20} />);
+
+        await user.click(screen.getByRole("combobox", { name: /author/i }));
+        await user.click(screen.getByRole("option", { name: "Autor Null" }));
+
+        expect(replaceMock).not.toHaveBeenCalledWith(expect.stringContaining("authorId=0"));
+    })
+
     it("Reset der Suche.", async () => {
         const user = userEvent.setup();
         renderFilter("q=harry&authorId=1");
@@ -78,14 +90,17 @@ describe("BooksFilters", () => {
         await user.clear(textbox);
 
         expect(textbox).toHaveValue("");
-        expect(replaceMock).toHaveBeenCalledWith("/books?");
+        expect(replaceMock).toHaveBeenCalledWith("/books?page=1");
     });
 
     it("entfernt den Autorfilter", async () => {
         const user = userEvent.setup();
         renderFilter("q=harry&authorId=1");
+
         await user.click(screen.getByRole("combobox", { name: /author/i }));
         await user.click(screen.getByRole("option", { name: /alle autoren/i }));
+
+        expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("page=1"));
         expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("q=harry"));
         expect(replaceMock).toHaveBeenCalledWith(expect.not.stringContaining("authorId"));
     });
