@@ -28,6 +28,7 @@ vi.mock("./actions", () => ({
 }));
 
 beforeEach(() => {
+    vi.clearAllMocks();
     replaceMock.mockClear();
     vi.mocked(useRouter).mockReturnValue({ replace: replaceMock, push: vi.fn() } as any);
     vi.mocked(usePathname).mockReturnValue("/books");
