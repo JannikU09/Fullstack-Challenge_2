@@ -16,6 +16,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
+  vi.clearAllMocks();
   replaceMock.mockClear();
 });
 
