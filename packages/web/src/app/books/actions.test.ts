@@ -91,7 +91,23 @@ describe("actions", () => {
 
         expect(searchParams.page).toBe(1);
         expect(searchParams.pageSize).toBe(20);
-    })
+    });
+
+    it("getBooks, gibt alle Bücher zurück und setzt page auf 1 und pageSize auf 20, da beide 0 sind.", async () => {
+        const total = bookTestList.length;
+
+        (db.select as any)
+            .mockReturnValueOnce(createChain(bookTestList))
+            .mockReturnValueOnce(createChain([{ total }]))
+            .mockReturnValueOnce(createChain([{ total }]));
+
+        const searchParams: BookSearchParams = { q: "", authorId: 1, page: -5, pageSize: 0 };
+
+        await getBooks(searchParams);
+
+        expect(searchParams.page).toBe(1);
+        expect(searchParams.pageSize).toBe(20);
+    });
 
     it("getAuthor, gibt alle Autoren zurück", async () => {
         (db.select as any).mockReturnValue(createChain(authorTestList));
@@ -108,6 +124,7 @@ describe("actions", () => {
         const result = await createBookAction(bookTestList[0]);
 
         expect(result.success).toBe(true);
+        expect(result.message).toEqual("Buch wurde hinzugefügt.");
     });
 
     it("createBookAction, wenn der Input invalid ist.", async () => {
@@ -127,6 +144,25 @@ describe("actions", () => {
         expect(result.error).toBe("Validation Error");
     });
 
+    it("falls createBookAction fehlschlägt.", async () => {
+        (db.insert as any).mockReturnValue(createChain([]));
+
+        const result = await createBookAction(bookTestList[0]);
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Buch konnte nicht hinzugefügt werden.");
+    });
+
+    it("createBookAction, Buch wird angelegt, kann aber nicht abgerufen werden.", async () => {
+        (db.insert as any).mockReturnValue(createChain([bookTestList[0].Books]));
+        (db.select as any).mockReturnValueOnce(createChain([]))
+
+        const result = await createBookAction(bookTestList[0]);
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Buch wurde angelegt, konnte aber nicht geladen werden.");
+    });
+
     it("updateBookAction, wenn alles passt", async () => {
         (db.update as any).mockReturnValue(createChain([bookTestList[1].Books]));
         (db.select as any).mockReturnValue(createChain([bookTestList[1]]));
@@ -134,6 +170,7 @@ describe("actions", () => {
         const result = await updateBookAction(2, bookTestList[1]);
 
         expect(result.success).toBe(true);
+        expect(result.message).toEqual("Buch wurde geändert.")
     });
 
     it("updateBookAction, wenn der Input invalid ist.", async () => {
@@ -159,14 +196,15 @@ describe("actions", () => {
         const result = await updateBookAction(99999, bookTestList[1]);
 
         expect(result.success).not.toBe(true);
-    })
+        expect(result.error).toEqual("Buch nicht gefunden.")
+    });
 
-    it("deleteBookAction, löscht ein Buch", async () => {
+    it("deleteBookAction, löscht erfolgreich ein Buch", async () => {
         (db.delete as any).mockReturnValue(createChain([bookTestList[0].Books]));
 
         const result = await deleteBookAction(1);
         expect(db.delete).toHaveBeenCalledOnce();
-        expect(result.message).toBe("Erfolgreich gelöscht");
+        expect(result.message).toBe("Erfolgreich gelöscht.");
     });
 
     it("deleteBookAction, wenn die id falsch ist", async () => {
@@ -175,5 +213,6 @@ describe("actions", () => {
         const result = await deleteBookAction(-2);
 
         expect(result.success).not.toBe(true);
+        expect(result.error).toEqual("Buch nicht gefunden.")
     });
 });

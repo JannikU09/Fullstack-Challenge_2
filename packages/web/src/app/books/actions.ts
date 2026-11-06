@@ -41,7 +41,7 @@ export async function getBooks(params: BookSearchParams) {
             .from(books)
             .innerJoin(authors, eq(books.authorId, authors.id))
             .where(isFilter)
-            .orderBy(books.authorId, books.year)
+            .orderBy(books.authorId, books.year, books.id)
             .limit(Number(params.pageSize))
             .offset(offset),
         db.select({ total: count() }).from(books).where(isFilter),
@@ -72,15 +72,25 @@ export async function createBookAction(bookInput: BookWithAuthor) {
         return { success: false, error: "Validation Error" };
     }
 
-    const [newBook] = await db.insert(books).values(result.data).returning();
+    const inserted = await db.insert(books).values(result.data).returning();
+
+    if (inserted.length === 0) {
+        return { success: false, error: "Buch konnte nicht hinzugefügt werden." };
+    }
+
+    const newBook = inserted[0];
     const [newBookWithAuthor] = await db
         .select()
         .from(books)
         .innerJoin(authors, eq(books.authorId, authors.id))
         .where(eq(books.id, newBook.id));
 
+    if (!newBookWithAuthor) {
+        return { success: false, error: "Buch wurde angelegt, konnte aber nicht geladen werden." };
+    }
+
     revalidatePath("/books");
-    return { success: true, data: newBookWithAuthor };
+    return { success: true, data: newBookWithAuthor, message: "Buch wurde hinzugefügt." };
 }
 
 export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
@@ -96,15 +106,14 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
     };
 
     revalidatePath("/books");
-    return { success: true };
+    return { success: true, message: "Buch wurde geändert." };
 }
 
 export async function deleteBookAction(id: number) {
-
     const deleted = await db.delete(books).where(eq(books.id, id)).returning();
     if (deleted.length === 0) {
-        return { success: false, error: "Buch nicht gefunden" };
+        return { success: false, error: "Buch nicht gefunden." };
     }
     revalidatePath("/books");
-    return { success: true, message: "Erfolgreich gelöscht" };
+    return { success: true, message: "Erfolgreich gelöscht." };
 }
