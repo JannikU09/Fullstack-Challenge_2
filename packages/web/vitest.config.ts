@@ -8,11 +8,15 @@ export default defineConfig({
         setupFiles: ["./vitest.setup.ts"],
         clearMocks: true,
         coverage: {
-            enabled: true,
             provider: 'v8',
             clean: true,
-            cleanOnRerun: true
+            cleanOnRerun: true,
+            reporter: ['text', 'html', 'lcov'],
+            reportsDirectory: './.vitest/coverage',
         },
-        reporters: ['html', ...configDefaults.reporters]
+        reporters: ["default"],
+        outputFile: {
+            html: './.vitest/html/index.html', // wird nur genutzt, wenn der html-Reporter aktiv ist
+        },
     },
 });
