@@ -1,17 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { atom } from "jotai";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { pageSizeAtom, pageSizeValueAtom } from "../../componentes/utils/atoms";
 import { BooksPagination } from "./BooksPagination";
 
 const replaceMock = vi.fn();
 
+let currentURL = "/books";
+
 vi.mock("next/navigation", () => ({
     useRouter: vi.fn(),
     usePathname: vi.fn(),
-    useSearchParams: vi.fn(),
+    useSearchParams: () => new URLSearchParams(currentURL.split("?")[1] ?? ""),
 }));
 
 vi.mock("../../componentes/utils/atoms", () => ({
@@ -25,7 +26,7 @@ beforeEach(() => {
 });
 
 function renderPagination(totalPages: number, page: number) {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams(`page=${page}`) as any);
+    currentURL = `/books?page=${page}`;
     return render(<BooksPagination totalPages={totalPages} />);
 }
 
@@ -58,5 +59,22 @@ describe("BooksPagination", () => {
         await user.click(option);
 
         expect(replaceMock).toHaveBeenCalledWith(expect.stringContaining("pageSize=20"));
+    });
+
+    it("prüft die aktuelle Page über den className, nachdem die Komponente gererendert wurde.", async () => {
+        currentURL = "/books?page=4"
+        const { rerender } = render(<BooksPagination totalPages={20} />)
+
+        expect(screen.getByRole("button", { name: "1" })).not.toHaveClass("button paginationCurrent");
+        expect(screen.getByRole("button", { name: "4" })).toHaveClass("button paginationCurrent");
+        console.log("Page 4", screen.getByRole("button", { name: "4" }));
+
+        currentURL = "/books?page=1";
+        rerender(<BooksPagination totalPages={20} />);
+
+        expect(screen.getByRole("button", { name: "1" })).toHaveClass("button paginationCurrent");
+        expect(screen.getByRole("button", { name: "4" })).not.toHaveClass("button paginationCurrent");
+
+        console.log("Pages", screen.getByRole("button", { name: "1" }));
     });
 });
