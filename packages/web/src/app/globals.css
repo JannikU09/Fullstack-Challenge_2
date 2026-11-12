@@ -154,3 +154,38 @@ button.danger {
 button.danger:hover {
   background: #aa1800;
 }
+
+button.pagination {
+  width: 10px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  transition: all 0.3s;
+}
+
+button.pagination:hover {
+  background: lightgray;
+}
+
+button.paginationCurrent {
+  width: 10px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+  background: lightgray;
+}
+
+button.paginationDisabled {
+  width: 10px;
+  height: 35px;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s;
+  cursor: default;
+}

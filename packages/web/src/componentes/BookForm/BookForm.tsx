@@ -88,6 +88,10 @@ export function BookForm({
                   isbn: isbn,
                   year: year === "" ? undefined : Number(year),
                 },
+                Author: {
+                  id: Number(authorId),
+                  name: "",
+                }
               });
             handleEmptyFields();
           }}

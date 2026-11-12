@@ -40,10 +40,15 @@ p {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
-
 }
 
 .choosePage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paginationPage {
   display: flex;
   justify-content: center;
   align-items: center;

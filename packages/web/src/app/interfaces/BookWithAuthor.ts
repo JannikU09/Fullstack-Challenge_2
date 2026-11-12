@@ -4,9 +4,9 @@ export interface BookWithAuthor {
   Books: {
     id?: number;
     title: string;
-    isbn?: string;
-    year?: number;
     authorId: number;
+    isbn: string;
+    year?: number | null;
   };
   Author: Author;
 }
