@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 beforeEach(() => {
-    vi.clearAllMocks()
+    vi.clearAllMocks();
     replaceMock.mockClear();
     vi.mocked(useRouter).mockReturnValue({ replace: replaceMock, push: vi.fn() } as any);
     vi.mocked(usePathname).mockReturnValue("/books");
@@ -27,9 +27,20 @@ function renderPagination(page: number | undefined, totalPages: number | undefin
 };
 
 describe("Pagination", () => {
+    const button_paginationCurrent = "button paginationCurrent";
+
     it("zeigt keine Seitenzahl an, wenn totalPages undefined ist.", async () => {
-        renderPagination(1, undefined)
+        renderPagination(1, undefined);
         expect(screen.queryByText("1")).not.toBeInTheDocument();
+    });
+
+    it("prüft die Pagination, dass die aktuelle Page den Classname (button paginationCurrent) hat", async () => {
+        renderPagination(4, 44);
+
+        const focusedPageButton = screen.getByRole("button", { name: "4" });
+
+        expect(focusedPageButton).toHaveClass(button_paginationCurrent);
+        expect(focusedPageButton).toHaveTextContent("4");
     });
 
     it("Deaktiviert FirstPage- bzw. ChevronLeft-Button, wenn die aktuelle Page <= 1 ist.", async () => {
@@ -40,7 +51,7 @@ describe("Pagination", () => {
 
     it("increasePage()", async () => {
         const user = userEvent.setup();
-        renderPagination(1, 20)
+        renderPagination(1, 20);
 
         const chevronRight = screen.getByRole("button", { name: /ChevronRight/i });
         await user.click(chevronRight);
@@ -142,39 +153,49 @@ describe("Pagination", () => {
         { page: 7, expected: ["1", "...", "6", "7", "8", "9", "10"] },
         { page: 8, expected: ["1", "...", "6", "7", "8", "9", "10"] },
         { page: 10, expected: ["1", "...", "6", "7", "8", "9", "10"] },
+    ])("zeigt bei page=$page (total=10, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages", ({
+        page,
+        expected,
+    }) => {
+        renderPagination(page, 10);
 
-    ])(
-        "zeigt bei page=$page (total=10, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages",
-        ({ page, expected }) => {
-            renderPagination(page, 10);
+        const labels = screen
+            .getAllByRole("button")
+            .map((b) => b.textContent ?? "")
+            .filter((t) => /^(\d+|\.\.\.)$/.test(t));
 
-            const labels = screen
-                .getAllByRole("button")
-                .map((b) => b.textContent ?? "")
-                .filter((t) => /^(\d+|\.\.\.)$/.test(t));
-
-            expect(labels).toEqual(expected);
-        },
-    );
+        expect(labels).toEqual(expected);
+    });
 
     it.each([
         { page: 0, expected: ["1", "2", "3", "4", "5", "...", "44"] },
         { page: 1, expected: ["1", "2", "3", "4", "5", "...", "44"] },
         { page: 15, expected: ["1", "...", "14", "15", "16", "...", "44"] },
         { page: 44, expected: ["1", "...", "40", "41", "42", "43", "44"] },
-    ])(
-        "zeigt bei page=$page (total=44, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages",
-        ({ page, expected }) => {
-            renderPagination(page, 44);
+    ])("zeigt bei page=$page (total=44, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für pages", ({
+        page,
+        expected,
+    }) => {
+        renderPagination(page, 44);
 
-            const labels = screen
-                .getAllByRole("button")
-                .map((b) => b.textContent ?? "")
-                .filter((t) => /^(\d+|\.\.\.)$/.test(t));
+        const labels = screen
+            .getAllByRole("button")
+            .map((b) => b.textContent ?? "")
+            .filter((t) => /^(\d+|\.\.\.)$/.test(t));
 
-            console.log(labels);
+        expect(labels).toEqual(expected);
+    });
 
-            expect(labels).toEqual(expected);
-        },
-    );
+    it("zeigt bei page=1 (total=1, atStartEnd=4, nextTo=1) die richtigen Auswahlmöglichkeiten für page", async () => {
+        renderPagination(1, 1);
+
+        const labels = screen
+            .getAllByRole("button")
+            .map((b) => b.textContent ?? "")
+            .filter((t) => /^(\d|\.\.\.)$/.test(t));
+
+        const expected = ["1"];
+
+        expect(labels).toEqual(expected);
+    });
 });
