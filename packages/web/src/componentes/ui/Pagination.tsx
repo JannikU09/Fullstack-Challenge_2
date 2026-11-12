@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight, FirstPage, LastPage } from "@mui/icons-material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import "../../app/books/page.css";
 
@@ -17,12 +16,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     const { replace } = useRouter();
     const params = new URLSearchParams(searchParams);
 
-    const [currentPage, setCurrentPage] = useState<number>(page ?? 1);
-
-    useEffect(() => {
-        const parsed = Number(params.get("page"));
-        setCurrentPage(Number.isNaN(parsed) || parsed < 1 ? 1 : parsed);
-    }, [params.get]);
+    const currentPage = Number(params.get("page"));
 
     const pageNumbers: number[] = [];
     if (totalPages !== undefined) {
@@ -76,7 +70,6 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
         const num = newPage;
         params.set("page", num.toString());
         replace(`${pathname}?${params.toString()}`);
-        setCurrentPage(num);
     };
 
     function increasePage() {
