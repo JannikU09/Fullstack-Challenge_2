@@ -251,4 +251,21 @@ describe("actions", () => {
         expect(result.success).not.toBe(true);
         expect(result.error).toEqual("Buch nicht gefunden.")
     });
+
+    it("deleteBookAction failed", async () => {
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => { });
+        const dbError = new Error("DB down");
+
+        (db.delete as any).mockImplementationOnce(() => {
+            throw dbError;
+        });
+
+        const result = await deleteBookAction(1);
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Validation Error");
+        expect(consoleSpy).toHaveBeenCalledWith("deleteBookAction failed", dbError);
+
+        consoleSpy.mockRestore();
+    });
 });

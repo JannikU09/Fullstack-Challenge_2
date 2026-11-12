@@ -120,10 +120,17 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
 };
 
 export async function deleteBookAction(id: number) {
-    const deleted = await db.delete(books).where(eq(books.id, id)).returning();
-    if (deleted.length === 0) {
-        return { success: false, error: "Buch nicht gefunden." };
+    try {
+        const deleted = await db.delete(books).where(eq(books.id, id)).returning();
+
+        if (deleted.length === 0) {
+            return { success: false, error: "Buch nicht gefunden." };
+        };
+
+        revalidatePath("/books");
+        return { success: true, message: "Erfolgreich gelöscht." };
+    } catch (error) {
+        console.error("deleteBookAction failed", error);
+        return { success: false, error: "Validation Error" };
     }
-    revalidatePath("/books");
-    return { success: true, message: "Erfolgreich gelöscht." };
 };
