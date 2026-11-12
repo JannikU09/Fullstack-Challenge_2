@@ -12,7 +12,7 @@ const schema = z.object({
     title: z.string().min(1),
     authorId: z.number().int().positive(),
     isbn: z.string().min(13).max(13),
-    year: z.number().int().min(1000).max(9999).optional(),
+    year: z.number().int().min(1000).max(9999).optional().nullish(),
 });
 
 export async function getBooks(params: BookSearchParams) {
@@ -58,12 +58,12 @@ export async function getBooks(params: BookSearchParams) {
         totalPages,
         totalWithoutFilter,
     };
-}
+};
 
 export async function getAuthors() {
     const allAuthors: Author[] = await db.select().from(authors);
     return allAuthors;
-}
+};
 
 export async function createBookAction(bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
@@ -72,26 +72,29 @@ export async function createBookAction(bookInput: BookWithAuthor) {
         return { success: false, error: "Validation Error" };
     }
 
-    const inserted = await db.insert(books).values(result.data).returning();
+    try {
+        const [newBook] = await db.insert(books).values(result.data).returning();
+        if (!newBook) {
+            return { success: false, error: "Buch konnte nicht hinzugefügt werden." };
+        };
 
-    if (inserted.length === 0) {
-        return { success: false, error: "Buch konnte nicht hinzugefügt werden." };
+        const [newBookWithAuthor] = await db
+            .select()
+            .from(books)
+            .innerJoin(authors, eq(books.authorId, authors.id))
+            .where(eq(books.id, newBook.id));
+        if (!newBookWithAuthor) {
+            return { success: false, error: "Buch wurde angelegt, konnte aber nicht geladen werden." };
+        };
+
+        revalidatePath("/books");
+        return { success: true, data: newBookWithAuthor, message: "Buch wurde hinzugefügt." };
+
+    } catch (error) {
+        console.error("createBookAction failed", error);
+        return { success: false, error: "Validation Error" };
     }
-
-    const newBook = inserted[0];
-    const [newBookWithAuthor] = await db
-        .select()
-        .from(books)
-        .innerJoin(authors, eq(books.authorId, authors.id))
-        .where(eq(books.id, newBook.id));
-
-    if (!newBookWithAuthor) {
-        return { success: false, error: "Buch wurde angelegt, konnte aber nicht geladen werden." };
-    }
-
-    revalidatePath("/books");
-    return { success: true, data: newBookWithAuthor, message: "Buch wurde hinzugefügt." };
-}
+};
 
 export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
@@ -100,14 +103,21 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
         return { success: false, error: "Validation Error" };
     }
 
-    const updated = await db.update(books).set(result.data).where(eq(books.id, id)).returning();
-    if (updated.length === 0) {
-        return { success: false, error: "Buch nicht gefunden." };
-    };
+    try {
 
-    revalidatePath("/books");
-    return { success: true, message: "Buch wurde geändert." };
-}
+
+        const updated = await db.update(books).set(result.data).where(eq(books.id, id)).returning();
+        if (updated.length === 0) {
+            return { success: false, error: "Buch nicht gefunden." };
+        };
+
+        revalidatePath("/books");
+        return { success: true, message: "Buch wurde geändert." };
+    } catch (error) {
+        console.error("updateBookAction failed", error);
+        return { success: false, error: "Validation Error" };
+    }
+};
 
 export async function deleteBookAction(id: number) {
     const deleted = await db.delete(books).where(eq(books.id, id)).returning();
@@ -116,4 +126,4 @@ export async function deleteBookAction(id: number) {
     }
     revalidatePath("/books");
     return { success: true, message: "Erfolgreich gelöscht." };
-}
+};

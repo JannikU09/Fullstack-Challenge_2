@@ -93,7 +93,7 @@ describe("actions", () => {
         expect(searchParams.pageSize).toBe(20);
     });
 
-    it("getBooks, gibt alle Bücher zurück und setzt page auf 1 und pageSize auf 20, da beide 0 sind.", async () => {
+    it("getBooks, gibt alle Bücher zurück und setzt page auf 1 und pageSize auf 20, da beide <= 0 sind.", async () => {
         const total = bookTestList.length;
 
         (db.select as any)
@@ -163,6 +163,25 @@ describe("actions", () => {
         expect(result.error).toBe("Buch wurde angelegt, konnte aber nicht geladen werden.");
     });
 
+    it("createBookAction failed", async () => {
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => { });
+        const dbError = new Error("DB down");
+
+        (db.insert as any).mockImplementationOnce(() => {
+            throw dbError;
+        });
+
+        const result = await createBookAction(bookTestList[0]);
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Validation Error");
+        expect(consoleSpy).toHaveBeenCalledWith("createBookAction failed", dbError);
+
+        consoleSpy.mockRestore();
+    });
+
+
+
     it("updateBookAction, wenn alles passt", async () => {
         (db.update as any).mockReturnValue(createChain([bookTestList[1].Books]));
         (db.select as any).mockReturnValue(createChain([bookTestList[1]]));
@@ -196,7 +215,24 @@ describe("actions", () => {
         const result = await updateBookAction(99999, bookTestList[1]);
 
         expect(result.success).not.toBe(true);
-        expect(result.error).toEqual("Buch nicht gefunden.")
+        expect(result.error).toEqual("Buch nicht gefunden.");
+    });
+
+    it("updateBookAction failed", async () => {
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => { });
+        const dbError = new Error("DB down");
+
+        (db.update as any).mockImplementationOnce(() => {
+            throw dbError;
+        });
+
+        const result = await updateBookAction(1, bookTestList[0]);
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe("Validation Error");
+        expect(consoleSpy).toHaveBeenCalledWith("updateBookAction failed", dbError);
+
+        consoleSpy.mockRestore();
     });
 
     it("deleteBookAction, löscht erfolgreich ein Buch", async () => {
