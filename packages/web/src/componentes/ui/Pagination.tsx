@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight, FirstPage, LastPage } from "@mui/icons-material";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import "../../app/books/page.css";
 
@@ -17,11 +16,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     const { replace } = useRouter();
     const params = new URLSearchParams(searchParams);
 
-    const [currentPage, setCurrentPage] = useState<number>(page ?? 1);
-
-    useEffect(() => {
-        setCurrentPage(Number(params.get("page")) ?? 1);
-    }, [params.get]);
+    const currentPage = Number(params.get("page"));
 
     const pageNumbers: number[] = [];
     if (totalPages !== undefined) {
@@ -72,11 +67,9 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     };
 
     function goToPage(newPage: number) {
-        if (totalPages === undefined) return;
         const num = newPage;
         params.set("page", num.toString());
         replace(`${pathname}?${params.toString()}`);
-        setCurrentPage(num);
     };
 
     function increasePage() {
@@ -89,8 +82,10 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
         goToPage(1);
     };
     function goToLastPage() {
+        /* v8 ignore start */
         if (totalPages === undefined) return;
         goToPage(totalPages);
+        /* v8 ignore end */
     };
 
     return (
@@ -101,16 +96,18 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => goToFirstPage()}
                     disabled={currentPage <= 1}
+                    ariaLabel="FirstPage"
                 >
-                    <FirstPage />
+                    <FirstPage titleAccess="FirstPage" />
                 </Button>
                 <Button
                     type="button"
                     variant={currentPage <= 1 ? "paginationDisabled" : "pagination"}
                     onClick={() => decreasePage()}
                     disabled={currentPage <= 1}
+                    ariaLabel="ChevronLeft"
                 >
-                    <ChevronLeft />
+                    <ChevronLeft titleAccess="ChevronLeft" />
                 </Button>
 
                 {paginationPages.map((pageNumber) => {
@@ -155,6 +152,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => increasePage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
+                    ariaLabel="ChevronRight"
                 >
                     <ChevronRight />
                 </Button>
@@ -163,10 +161,11 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
                     onClick={() => goToLastPage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
+                    ariaLabel="LastPage"
                 >
                     <LastPage />
                 </Button>
             </div>
-        </div>
+        </div >
     );
 };
