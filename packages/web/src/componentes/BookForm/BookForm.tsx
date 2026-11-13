@@ -62,8 +62,12 @@ export function BookForm({
           autoComplete="off"
           required
         />
-        <p className="isbnHilfstext" hidden={isbn.length >= 13}>Noch {13 - isbn.length} Zeichen</p>
-        <p className="isbnHilfstext" hidden={isbn.length <= 13}>{isbn.length - 13} Zeichen zu viel!</p>
+        <p className="isbnHilfstext" hidden={isbn.length >= 13}>
+          Noch {13 - isbn.length} Zeichen
+        </p>
+        <p className="isbnHilfstext" hidden={isbn.length <= 13}>
+          {isbn.length - 13} Zeichen zu viel!
+        </p>
         <div style={{ margin: "10px" }} />
 
         <TextField
@@ -79,21 +83,19 @@ export function BookForm({
           variant="primary"
           type="button"
           onClick={async (e) => {
-            await onSubmit?.(
-              e,
-              {
-                Books: {
-                  id: initialValues?.id,
-                  title: title,
-                  authorId: Number(authorId),
-                  isbn: isbn,
-                  year: year === "" ? undefined : Number(year),
-                },
-                Author: {
-                  id: Number(authorId),
-                  name: "",
-                }
-              });
+            await onSubmit?.(e, {
+              Books: {
+                id: initialValues?.id,
+                title: title,
+                authorId: Number(authorId),
+                isbn: isbn,
+                year: year === "" ? undefined : Number(year),
+              },
+              Author: {
+                id: Number(authorId),
+                name: "",
+              },
+            });
             handleEmptyFields();
           }}
         >
