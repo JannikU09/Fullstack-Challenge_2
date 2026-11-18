@@ -7,7 +7,15 @@ export const DateDisplay = () => {
     const date = useAtomValue(dateAtom);
 
     return (
-        <div>
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: "18px",
+                // marginTop: "30px"
+            }}
+        >
             {date}
         </div>
     );
