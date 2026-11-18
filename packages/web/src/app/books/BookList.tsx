@@ -110,8 +110,8 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        const id = book.Books.id;
                                        if (id === undefined) return;
                                        const result = await updateBookAction(id, data);
-                                       setOpenBookId(undefined);
                                        if (result.success === true) {
+                                          setOpenBookId(undefined);
                                           toast.success(result.message, { description: `${date}, ${time} Uhr` });
                                        } else {
                                           toast.error(result.error, { description: `${date}, ${time} Uhr` });
