@@ -67,14 +67,11 @@ describe("BooksPagination", () => {
 
         expect(screen.getByRole("button", { name: "1" })).not.toHaveClass("button paginationCurrent");
         expect(screen.getByRole("button", { name: "4" })).toHaveClass("button paginationCurrent");
-        console.log("Page 4", screen.getByRole("button", { name: "4" }));
 
         currentURL = "/books?page=1";
         rerender(<BooksPagination totalPages={20} />);
 
         expect(screen.getByRole("button", { name: "1" })).toHaveClass("button paginationCurrent");
         expect(screen.getByRole("button", { name: "4" })).not.toHaveClass("button paginationCurrent");
-
-        console.log("Pages", screen.getByRole("button", { name: "1" }));
     });
 });
