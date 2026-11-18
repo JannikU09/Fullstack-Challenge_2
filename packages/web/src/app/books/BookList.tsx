@@ -19,10 +19,15 @@ type BookListProps = {
 export const BookList = ({ books, authors, total }: BookListProps) => {
    const [openBookId, setOpenBookId] = useState<number | undefined>(undefined);
 
+
    useEffect(() => {
-      total === 1 ?
-         toast.success(`${total} Buch geladen.`) :
+      if (total <= 0) {
+         toast.warning(`${total} Bücher geladen`);
+      } else if (total === 1) {
+         toast.success("1 Buch geladen.");
+      } else {
          toast.success(`${total} Bücher geladen.`);
+      };
    }, [total]);
 
    return (
@@ -69,10 +74,15 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                            <Button
                               variant="danger"
                               type="button"
-                              onClick={() => {
+                              onClick={async () => {
                                  const id = book.Books.id;
                                  if (id === undefined) return;
-                                 deleteBookAction(id);
+                                 const result = await deleteBookAction(id);
+                                 if (result.success === true) {
+                                    toast.success(result.message);
+                                 } else {
+                                    toast.error(result.error);
+                                 }
                               }}
                               ariaLabel="Delete"
                            >
@@ -91,11 +101,16 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                        year: book.Books.year ?? undefined,
                                     }}
                                     authors={authors}
-                                    onSubmit={(_e, data) => {
+                                    onSubmit={async (_e, data) => {
                                        const id = book.Books.id;
                                        if (id === undefined) return;
-                                       updateBookAction(id, data);
+                                       const result = await updateBookAction(id, data);
                                        setOpenBookId(undefined);
+                                       if (result.success === true) {
+                                          toast.success(result.message);
+                                       } else {
+                                          toast.error(result.error);
+                                       }
                                     }}
                                     submitLabel="Update"
                                  />
@@ -112,7 +127,14 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
          <div className="formField">
             <BookForm
                authors={authors}
-               onSubmit={(_e, data) => createBookAction(data)}
+               onSubmit={async (_e, data) => {
+                  const result = await createBookAction(data);
+                  if (result.success === true) {
+                     toast.success(result.message);
+                  } else {
+                     toast.error(result.error);
+                  }
+               }}
                submitLabel="Add"
             />
          </div>
