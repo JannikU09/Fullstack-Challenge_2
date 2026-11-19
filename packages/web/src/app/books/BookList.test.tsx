@@ -3,7 +3,8 @@ import { userEvent } from "@testing-library/user-event";
 import { createStore } from "jotai";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { Toaster } from "../../componentes/ui/sonner";
 import { dateAtom, timeAtom } from "../../componentes/utils/atoms";
 import { authorTestList, bookTestList } from "../../lib/bookTestList";
 import { createBookAction, deleteBookAction, updateBookAction } from "./actions";
@@ -57,13 +58,35 @@ beforeEach(() => {
     vi.mocked(usePathname).mockReturnValue("/books");
 });
 
+beforeAll(() => {
+    Object.defineProperty(window, "matchMedia", {
+        writable: true,
+        value: vi.fn().mockImplementation((query: string) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })),
+    });
+});
+
 afterEach(() => {
     vi.restoreAllMocks();
+    toast.dismiss();
 });
 
 function renderBookList(totalBooks?: number, books = bookList) {
-    return render(<BookList authors={authorList} books={books} total={totalBooks ?? 4} />);
-};
+    return render(
+        <div>
+            <Toaster />
+            <BookList authors={authorList} books={books} total={totalBooks ?? 4} />
+        </div>,
+    );
+}
 
 describe("BookList", () => {
     it("zeigt keine Bücher an, wenn books.lenght === 0", async () => {
@@ -238,8 +261,11 @@ describe("BookList", () => {
         console.log("spy_create", spy_create.mock.lastCall);
 
         // expect(spy_create).toHaveBeenCalledTimes(1);
+        expect(await screen.findByText("Buch wurde hinzugefügt.")).toBeInTheDocument();
         expect(createBookAction).toHaveBeenCalledOnce();
-        expect(spy_create).toHaveBeenLastCalledWith("Buch wurde hinzugefügt.", { description: `${date}, ${time} Uhr` });
+        expect(spy_create).toHaveBeenLastCalledWith("Buch wurde hinzugefügt.", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 
     it("zeigt den Error-Toast, wenn createBookAction fehlschlägt.", async () => {
@@ -271,7 +297,10 @@ describe("BookList", () => {
 
         console.log("spy_createError", spy_createError.mock.calls);
 
-        expect(spy_createError).toHaveBeenLastCalledWith("Validation Error", { description: `${date}, ${time} Uhr` });
+        expect(await screen.findByText("Validation Error")).toBeInTheDocument();
+        expect(spy_createError).toHaveBeenLastCalledWith("Validation Error", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 
     it("zeigt den Erfolgs-Toast, wenn ein Buch erfolgreich geändert wurde.", async () => {
@@ -310,7 +339,10 @@ describe("BookList", () => {
         console.log("spy_update", spy_update.mock.calls);
 
         expect(updateBookAction).toHaveBeenCalled();
-        expect(spy_update).toHaveBeenLastCalledWith("Buch wurde geändert.", { description: `${date}, ${time} Uhr` });
+        expect(await screen.findByText("Buch wurde geändert.")).toBeInTheDocument();
+        expect(spy_update).toHaveBeenLastCalledWith("Buch wurde geändert.", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 
     it("zeigt den Error-Toast, wenn updateBookAction fehlschlägt.", async () => {
@@ -347,7 +379,10 @@ describe("BookList", () => {
 
         console.log("spy_updateError", spy_updateError.mock.calls);
 
-        expect(spy_updateError).toHaveBeenLastCalledWith("Validation Error", { description: `${date}, ${time} Uhr` });
+        expect(await screen.findByText("Validation Error")).toBeInTheDocument();
+        expect(spy_updateError).toHaveBeenLastCalledWith("Validation Error", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 
     it("zeigt den Erfolgs-Toast, wenn ein Buch erfolgreich gelöscht wurde.", async () => {
@@ -363,7 +398,10 @@ describe("BookList", () => {
 
         console.log("spy_delete", spy_delete.mock.calls);
 
-        expect(spy_delete).toHaveBeenLastCalledWith("Erfolgreich gelöscht.", { description: `${date}, ${time} Uhr` });
+        expect(await screen.findByText("Erfolgreich gelöscht.")).toBeInTheDocument();
+        expect(spy_delete).toHaveBeenLastCalledWith("Erfolgreich gelöscht.", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 
     it("zeigt den Error-Toast, wenn deleteBookAction fehlschlägt.", async () => {
@@ -383,6 +421,9 @@ describe("BookList", () => {
 
         console.log("spy_deleteError", spy_deleteError.mock.calls);
 
-        expect(spy_deleteError).toHaveBeenLastCalledWith("Validation Error", { description: `${date}, ${time} Uhr` });
+        expect(await screen.findByText("Validation Error")).toBeInTheDocument();
+        expect(spy_deleteError).toHaveBeenLastCalledWith("Validation Error", {
+            description: `${date}, ${time} Uhr`,
+        });
     });
 });
