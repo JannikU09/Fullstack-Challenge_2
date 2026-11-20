@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import type { BookFormProps } from "../../app/interfaces/BookFormProps";
 import { Button } from "../ui/Button";
 import "./bookForm.css";
@@ -16,6 +16,9 @@ export function BookForm({
   const [authorId, setAuthorId] = useState(initialValues?.authorId ?? "");
   const [isbn, setIsbn] = useState(initialValues?.isbn ?? "");
   const [year, setYear] = useState(initialValues?.year ?? "");
+  const [isValidTitle, setIsValidTitle] = useState(false);
+  const [isValidAuthor, setIsValidAuthor] = useState(false);
+  const [isValidIsbn, setIsValidIsbn] = useState(false);
 
   const handleEmptyFields = () => {
     if (!initialValues) {
@@ -26,23 +29,51 @@ export function BookForm({
     }
   };
 
+  const handleValidationTitle = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
+    const reg = /^[a-zA-zäöüÄÖÜ]+$/g;
+    setIsValidTitle(reg.test(e.target.value));
+    setTitle(e.target.value);
+  };
+
+  const handleValidationAuthor = (e: string | number) => {
+    const reg = /\w/g;
+    const authorId = String(e)
+    setIsValidAuthor(reg.test(authorId));
+    setAuthorId(authorId);
+  };
+
+  const handleValidationIsbn = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
+    const reg = /^\d+$/g;
+    setIsValidIsbn(reg.test(e.target.value));
+    setIsbn(e.target.value);
+  };
+
   return (
     <div>
       <Box>
         <TextField
           value={title}
           label="Title"
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(event) => handleValidationTitle(event)}
           autoComplete="off"
           required
+          error={!isValidTitle}
         />
+        <p className="errortext" hidden={isValidTitle}>
+          Bitte einen Title eingeben.
+        </p>
+
         <div style={{ margin: "10px" }} />
 
-        <FormControl fullWidth required>
+        <FormControl
+          fullWidth
+          required
+          error={!isValidAuthor}
+        >
           <InputLabel>Author</InputLabel>
           <Select
             value={authorId}
-            onChange={(event) => setAuthorId(event.target.value)}
+            onChange={(event) => handleValidationAuthor(event.target.value)}
             label="Author"
             aria-label="Author"
           >
@@ -53,17 +84,28 @@ export function BookForm({
             ))}
           </Select>
         </FormControl>
+        <p className="errortext" hidden={isValidAuthor}>
+          Bitte einen Author auswählen.
+        </p>
         <div style={{ margin: "10px" }} />
 
         <TextField
           value={isbn}
           label="ISBN"
-          onChange={(event) => setIsbn(event.target.value)}
+          onChange={(event) => handleValidationIsbn(event)}
           autoComplete="off"
           required
+          error={!isValidIsbn}
         />
-        <p className="isbnHilfstext" hidden={isbn.length >= 13}>Noch {13 - isbn.length} Zeichen</p>
-        <p className="isbnHilfstext" hidden={isbn.length <= 13}>{isbn.length - 13} Zeichen zu viel!</p>
+        <p className="errortext" hidden={isValidIsbn}>
+          Nur Ziffern eingeben.
+        </p>
+        <p className="errortext" hidden={isbn.length >= 13}>
+          Noch {13 - isbn.length} Zeichen
+        </p>
+        <p className="errortext" hidden={isbn.length <= 13}>
+          {isbn.length - 13} Zeichen zu viel!
+        </p>
         <div style={{ margin: "10px" }} />
 
         <TextField
@@ -79,21 +121,19 @@ export function BookForm({
           variant="primary"
           type="button"
           onClick={async (e) => {
-            await onSubmit?.(
-              e,
-              {
-                Books: {
-                  id: initialValues?.id,
-                  title: title,
-                  authorId: Number(authorId),
-                  isbn: isbn,
-                  year: year === "" ? undefined : Number(year),
-                },
-                Author: {
-                  id: Number(authorId),
-                  name: "",
-                }
-              });
+            await onSubmit?.(e, {
+              Books: {
+                id: initialValues?.id,
+                title: title,
+                authorId: Number(authorId),
+                isbn: isbn,
+                year: year === "" ? undefined : Number(year),
+              },
+              Author: {
+                id: Number(authorId),
+                name: "",
+              },
+            });
             handleEmptyFields();
           }}
         >

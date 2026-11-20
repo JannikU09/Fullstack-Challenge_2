@@ -16,6 +16,10 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
     const { replace } = useRouter();
     const params = new URLSearchParams(searchParams);
 
+    if (!params.get("page")) {
+        params.set("page", "1");
+    };
+
     const currentPage = Number(params.get("page"));
 
     const pageNumbers: number[] = [];
@@ -37,7 +41,7 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
 
         if (showLeftDots) {
             paginationPages.push("dots-left");
-        };
+        }
 
         let start: number;
         let end: number;
@@ -49,44 +53,44 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
             start = Math.max(2, totalPages - itemsAtStartEnd);
             end = totalPages - 1;
         } else {
-            start = showLeftDots ? Math.max(2, currentPage - itemsNextTo) : 2
+            start = showLeftDots ? Math.max(2, currentPage - itemsNextTo) : 2;
             end = showRightDots ? Math.min(totalPages - 1, currentPage + itemsNextTo) : totalPages - 1;
-        };
+        }
 
         for (let i = start; i <= end; i++) {
             paginationPages.push(i);
-        };
+        }
 
         if (showRightDots) {
             paginationPages.push("dots-right");
-        };
+        }
 
         if (totalPages > 1) {
             paginationPages.push(totalPages);
-        };
-    };
+        }
+    }
 
     function goToPage(newPage: number) {
         const num = newPage;
         params.set("page", num.toString());
         replace(`${pathname}?${params.toString()}`);
-    };
+    }
 
     function increasePage() {
         goToPage(currentPage + 1);
-    };
+    }
     function decreasePage() {
         goToPage(currentPage - 1);
-    };
+    }
     function goToFirstPage() {
         goToPage(1);
-    };
+    }
     function goToLastPage() {
         /* v8 ignore start */
         if (totalPages === undefined) return;
         goToPage(totalPages);
         /* v8 ignore end */
-    };
+    }
 
     return (
         <div>
@@ -115,17 +119,12 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     const label = isDot ? "..." : pageNumber;
                     const key = isDot ? pageNumber : `page-${pageNumber}`;
 
-
                     if (currentPage === pageNumber) {
                         return (
-                            <Button
-                                key={key}
-                                type="button"
-                                variant="paginationCurrent"
-                            >
+                            <Button key={key} type="button" variant="paginationCurrent">
                                 {label}
                             </Button>
-                        )
+                        );
                     }
                     return (
                         <Button
@@ -144,12 +143,16 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                         >
                             {label}
                         </Button>
-                    )
+                    );
                 })}
 
                 <Button
                     type="button"
-                    variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
+                    variant={
+                        totalPages === undefined || currentPage >= totalPages
+                            ? "paginationDisabled"
+                            : "pagination"
+                    }
                     onClick={() => increasePage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
                     ariaLabel="ChevronRight"
@@ -158,7 +161,11 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                 </Button>
                 <Button
                     type="button"
-                    variant={totalPages === undefined || currentPage >= totalPages ? "paginationDisabled" : "pagination"}
+                    variant={
+                        totalPages === undefined || currentPage >= totalPages
+                            ? "paginationDisabled"
+                            : "pagination"
+                    }
                     onClick={() => goToLastPage()}
                     disabled={totalPages === undefined || currentPage >= totalPages}
                     ariaLabel="LastPage"
@@ -166,6 +173,6 @@ export const Pagination = ({ totalPages, page, itemsNextTo, itemsAtStartEnd }: P
                     <LastPage />
                 </Button>
             </div>
-        </div >
+        </div>
     );
 };
