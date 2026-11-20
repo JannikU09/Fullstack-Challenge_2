@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DateDisplay } from "../componentes/ui/DateDisplay";
 import { Toaster } from "../componentes/ui/sonner";
 import "./globals.css";
 
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de">
       <body>
         <div className="container">
+          <DateDisplay />
           <nav>
             <Link href="/" className="nav-brand">
               Fullstack Challenge
@@ -21,11 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/books">Bücher</Link>
             <Link href="/api-doc">API Docs</Link>
           </nav>
-          <Toaster
-            richColors
-            expand
-            duration={2500}
-          />
+          <Toaster richColors expand duration={2500} />
           <main>{children}</main>
         </div>
       </body>
