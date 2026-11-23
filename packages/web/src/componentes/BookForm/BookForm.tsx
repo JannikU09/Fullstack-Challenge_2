@@ -19,6 +19,7 @@ export function BookForm({
   const [isValidTitle, setIsValidTitle] = useState(false);
   const [isValidAuthor, setIsValidAuthor] = useState(false);
   const [isValidIsbn, setIsValidIsbn] = useState(false);
+  const [isValidYear, setIsValidYear] = useState(false);
 
   const handleEmptyFields = () => {
     if (!initialValues) {
@@ -31,21 +32,34 @@ export function BookForm({
 
   const handleValidationTitle = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
     const reg = /^[a-zA-zäöüÄÖÜ]+$/g;
-    setIsValidTitle(reg.test(e.target.value));
-    setTitle(e.target.value);
+    const title = e.target.value;
+
+    setIsValidTitle(reg.test(title));
+    setTitle(title);
   };
 
   const handleValidationAuthor = (e: string | number) => {
     const reg = /\w/g;
-    const authorId = String(e)
+    const authorId = String(e);
+
     setIsValidAuthor(reg.test(authorId));
     setAuthorId(authorId);
   };
 
   const handleValidationIsbn = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
-    const reg = /^\d+$/g;
-    setIsValidIsbn(reg.test(e.target.value));
-    setIsbn(e.target.value);
+    const reg = /^\d{13}$/g;
+    const isbn = e.target.value;
+
+    setIsValidIsbn(reg.test(isbn));
+    setIsbn(isbn);
+  };
+
+  const handleValidationYear = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
+    const reg = /^\d{4}/;
+    const year = e.target.value;
+
+    setIsValidYear(reg.test(year));
+    setYear(year);
   };
 
   return (
@@ -59,10 +73,9 @@ export function BookForm({
           required
           error={!isValidTitle}
         />
-        <p className="errortext" hidden={isValidTitle}>
+        <p className="errorText" hidden={isValidTitle}>
           Bitte einen Title eingeben.
         </p>
-
         <div style={{ margin: "10px" }} />
 
         <FormControl
@@ -84,7 +97,7 @@ export function BookForm({
             ))}
           </Select>
         </FormControl>
-        <p className="errortext" hidden={isValidAuthor}>
+        <p className="errorText" hidden={isValidAuthor}>
           Bitte einen Author auswählen.
         </p>
         <div style={{ margin: "10px" }} />
@@ -97,13 +110,13 @@ export function BookForm({
           required
           error={!isValidIsbn}
         />
-        <p className="errortext" hidden={isValidIsbn}>
+        <p className="errorText" hidden={isValidIsbn}>
           Nur Ziffern eingeben.
         </p>
-        <p className="errortext" hidden={isbn.length >= 13}>
+        <p className="errorText" hidden={isbn.length >= 13}>
           Noch {13 - isbn.length} Zeichen
         </p>
-        <p className="errortext" hidden={isbn.length <= 13}>
+        <p className="errorText" hidden={isbn.length <= 13}>
           {isbn.length - 13} Zeichen zu viel!
         </p>
         <div style={{ margin: "10px" }} />
@@ -111,8 +124,8 @@ export function BookForm({
         <TextField
           value={year}
           label="Year"
-          onChange={(event) => setYear(event.target.value)}
-          autoComplete="off"
+          onChange={(event) => handleValidationYear(event)}
+          error={!isValidYear}
         />
         <h6 style={{ color: "gray" }}>required *</h6>
         <div style={{ margin: "2.5px" }} />
