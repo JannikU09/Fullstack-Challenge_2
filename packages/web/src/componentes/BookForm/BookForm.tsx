@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 import type { BookFormProps } from "../../app/interfaces/BookFormProps";
 import { Button } from "../ui/Button";
 import "./bookForm.css";
@@ -16,10 +16,12 @@ export function BookForm({
   const [authorId, setAuthorId] = useState(initialValues?.authorId ?? "");
   const [isbn, setIsbn] = useState(initialValues?.isbn ?? "");
   const [year, setYear] = useState(initialValues?.year ?? "");
-  const [isValidTitle, setIsValidTitle] = useState(false);
-  const [isValidAuthor, setIsValidAuthor] = useState(false);
-  const [isValidIsbn, setIsValidIsbn] = useState(false);
-  const [isValidYear, setIsValidYear] = useState(false);
+
+  const isValidTitle = title.trim() !== "";
+  const isValidAuthor = String(authorId) !== "";
+  const isValidIsbn = /^\d+$/.test(isbn);
+  const isValidIsbnLength = /^\d{13}$/.test(isbn);
+  const isValidYear = /^(\d{4})?$/.test(String(year));
 
   const handleEmptyFields = () => {
     if (!initialValues) {
@@ -30,45 +32,13 @@ export function BookForm({
     }
   };
 
-  const handleValidationTitle = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
-    const reg = /^[a-zA-zäöüÄÖÜ]+$/g;
-    const title = e.target.value;
-
-    setIsValidTitle(reg.test(title));
-    setTitle(title);
-  };
-
-  const handleValidationAuthor = (e: string | number) => {
-    const reg = /\w/g;
-    const authorId = String(e);
-
-    setIsValidAuthor(reg.test(authorId));
-    setAuthorId(authorId);
-  };
-
-  const handleValidationIsbn = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
-    const reg = /^\d{13}$/g;
-    const isbn = e.target.value;
-
-    setIsValidIsbn(reg.test(isbn));
-    setIsbn(isbn);
-  };
-
-  const handleValidationYear = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>) => {
-    const reg = /^\d{4}/;
-    const year = e.target.value;
-
-    setIsValidYear(reg.test(year));
-    setYear(year);
-  };
-
   return (
     <div>
       <Box>
         <TextField
           value={title}
           label="Title"
-          onChange={(event) => handleValidationTitle(event)}
+          onChange={(event) => setTitle(event.target.value)}
           autoComplete="off"
           required
           error={!isValidTitle}
@@ -86,7 +56,7 @@ export function BookForm({
           <InputLabel>Author</InputLabel>
           <Select
             value={authorId}
-            onChange={(event) => handleValidationAuthor(event.target.value)}
+            onChange={(event) => setAuthorId(event.target.value)}
             label="Author"
             aria-label="Author"
           >
@@ -105,16 +75,16 @@ export function BookForm({
         <TextField
           value={isbn}
           label="ISBN"
-          onChange={(event) => handleValidationIsbn(event)}
+          onChange={(event) => setIsbn(event.target.value)}
           autoComplete="off"
           required
-          error={!isValidIsbn}
+          error={!isValidIsbn || !isValidIsbnLength}
         />
         <p className="errorText" hidden={isValidIsbn}>
           Nur Ziffern eingeben.
         </p>
         <p className="errorText" hidden={isbn.length >= 13}>
-          Noch {13 - isbn.length} Zeichen
+          Noch {13 - isbn.length} Zeichen.
         </p>
         <p className="errorText" hidden={isbn.length <= 13}>
           {isbn.length - 13} Zeichen zu viel!
@@ -124,9 +94,12 @@ export function BookForm({
         <TextField
           value={year}
           label="Year"
-          onChange={(event) => handleValidationYear(event)}
+          onChange={(event) => setYear(event.target.value)}
           error={!isValidYear}
         />
+        <p className="errorText" hidden={isValidYear}>
+          Nur 4 Ziffern eingeben.
+        </p>
         <h6 style={{ color: "gray" }}>required *</h6>
         <div style={{ margin: "2.5px" }} />
 
