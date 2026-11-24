@@ -134,7 +134,7 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "123456789012");
 
-        expect(screen.getByText("Noch 1 Zeichen")).toBeVisible();
+        expect(screen.getByText("Noch 1 Zeichen.")).toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 
@@ -145,7 +145,7 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "1234567890123");
 
-        expect(screen.getByText(/^Noch \d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText(/^Noch \d+ Zeichen.$/)).not.toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 
@@ -156,14 +156,14 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "12345678901234");
 
-        expect(screen.getByText(/^Noch -?\d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText(/^Noch -?\d+ Zeichen.$/)).not.toBeVisible();
         expect(screen.getByText("1 Zeichen zu viel!")).toBeVisible();
     });
 
     it("ISBN-Hilfstexte, 0 Zeichen eingetippt", async () => {
         renderBookForm();
 
-        expect(screen.getByText("Noch 13 Zeichen")).toBeVisible();
+        expect(screen.getByText("Noch 13 Zeichen.")).toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 });
