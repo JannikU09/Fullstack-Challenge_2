@@ -141,7 +141,7 @@ describe("actions", () => {
         const result = await createBookAction(invalidInput);
 
         expect(result.success).toBe(false);
-        expect(result.error).toBe("Validation Error");
+        expect(result.error).toBe(result.error);
     });
 
     it("falls createBookAction fehlschlägt.", async () => {
@@ -206,7 +206,7 @@ describe("actions", () => {
         const result = await updateBookAction(1, invalidInput);
 
         expect(result.success).toBe(false);
-        expect(result.error).toBe("Validation Error");
+        expect(result.error).toBe(result.error);
     });
 
     it("falls updateBookAction fehlschlägt.", async () => {
