@@ -258,8 +258,6 @@ describe("BookList", () => {
 
         await user.click(screen.getByRole("button", { name: /add/i }));
 
-        console.log("spy_create", spy_create.mock.lastCall);
-
         // expect(spy_create).toHaveBeenCalledTimes(1);
         expect(await screen.findByText("Buch wurde hinzugefügt.")).toBeInTheDocument();
         expect(createBookAction).toHaveBeenCalledOnce();
@@ -294,8 +292,6 @@ describe("BookList", () => {
         await user.type(yearTextbox, "2025");
 
         await user.click(screen.getByRole("button", { name: /add/i }));
-
-        console.log("spy_createError", spy_createError.mock.calls);
 
         expect(await screen.findByText("Validation Error")).toBeInTheDocument();
         expect(spy_createError).toHaveBeenLastCalledWith("Validation Error", {
@@ -336,8 +332,6 @@ describe("BookList", () => {
 
         await user.click(screen.getByRole("button", { name: /update/i }));
 
-        console.log("spy_update", spy_update.mock.calls);
-
         expect(updateBookAction).toHaveBeenCalled();
         expect(await screen.findByText("Buch wurde geändert.")).toBeInTheDocument();
         expect(spy_update).toHaveBeenLastCalledWith("Buch wurde geändert.", {
@@ -377,8 +371,6 @@ describe("BookList", () => {
 
         await user.click(screen.getByRole("button", { name: /update/i }));
 
-        console.log("spy_updateError", spy_updateError.mock.calls);
-
         expect(await screen.findByText("Validation Error")).toBeInTheDocument();
         expect(spy_updateError).toHaveBeenLastCalledWith("Validation Error", {
             description: `${date}, ${time} Uhr`,
@@ -395,8 +387,6 @@ describe("BookList", () => {
 
         const deleteButton = screen.getByRole("button", { name: /delete/i });
         await user.click(deleteButton);
-
-        console.log("spy_delete", spy_delete.mock.calls);
 
         expect(await screen.findByText("Erfolgreich gelöscht.")).toBeInTheDocument();
         expect(spy_delete).toHaveBeenLastCalledWith("Erfolgreich gelöscht.", {
@@ -418,8 +408,6 @@ describe("BookList", () => {
 
         const deleteButton = screen.getByRole("button", { name: /delete/i });
         await user.click(deleteButton);
-
-        console.log("spy_deleteError", spy_deleteError.mock.calls);
 
         expect(await screen.findByText("Validation Error")).toBeInTheDocument();
         expect(spy_deleteError).toHaveBeenLastCalledWith("Validation Error", {
