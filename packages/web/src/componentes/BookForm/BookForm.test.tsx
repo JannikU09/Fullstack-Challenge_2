@@ -74,7 +74,7 @@ describe("BookForm", () => {
 
     it("ruft onSubmit ohne initialValues auf.", async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn().mockResolvedValue(true);
         render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Add" />);
 
         await user.type(screen.getByRole("textbox", { name: /title/i }), "Harry");
@@ -95,7 +95,7 @@ describe("BookForm", () => {
 
     it("ruft onSubmit mit initialValues auf.", async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn().mockResolvedValue(true);
         render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Update" initialValues={initialValuess} />);
 
 
