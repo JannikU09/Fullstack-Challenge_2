@@ -38,7 +38,7 @@ export default async function BooksPage({
 
       <BookList books={books} authors={authors} total={total} />
 
-      <div style={{ margin: "15px" }} />
+      <div style={{ margin: "10px" }} />
 
       <BooksPagination totalPages={totalPages} />
     </div>
