@@ -5,6 +5,6 @@ import type { BookWithAuthor } from "./BookWithAuthor";
 export interface BookFormProps {
   initialValues?: BookInitialValues;
   authors: Author[];
-  onSubmit?: (event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) => void;
+  onSubmit?: (event: React.MouseEvent<HTMLButtonElement>, data: BookWithAuthor) => Promise<boolean>;
   submitLabel?: string;
 }
