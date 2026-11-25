@@ -107,7 +107,7 @@ export function BookForm({
           variant="primary"
           type="button"
           onClick={async (e) => {
-            await onSubmit?.(e, {
+            const isSuccess = await onSubmit?.(e, {
               Books: {
                 id: initialValues?.id,
                 title: title,
@@ -120,7 +120,9 @@ export function BookForm({
                 name: "",
               },
             });
-            handleEmptyFields();
+            if (isSuccess) {
+              handleEmptyFields();
+            }
           }}
         >
           <strong>{submitLabel}</strong>
