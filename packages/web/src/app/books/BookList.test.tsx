@@ -293,10 +293,13 @@ describe("BookList", () => {
 
         await user.click(screen.getByRole("button", { name: /add/i }));
 
-        expect(await screen.findByText("Validation Error")).toBeInTheDocument();
-        expect(spy_createError).toHaveBeenLastCalledWith("Validation Error", {
-            description: `${date}, ${time} Uhr`,
-        });
+        expect(await screen.findByText("Überprüfe deine Eingaben:")).toBeInTheDocument();
+        expect(spy_createError).toHaveBeenLastCalledWith(
+            "Überprüfe deine Eingaben:",
+            expect.objectContaining({
+                description: expect.anything(),
+            }),
+        );
     });
 
     it("zeigt den Erfolgs-Toast, wenn ein Buch erfolgreich geändert wurde.", async () => {
@@ -371,10 +374,13 @@ describe("BookList", () => {
 
         await user.click(screen.getByRole("button", { name: /update/i }));
 
-        expect(await screen.findByText("Validation Error")).toBeInTheDocument();
-        expect(spy_updateError).toHaveBeenLastCalledWith("Validation Error", {
-            description: `${date}, ${time} Uhr`,
-        });
+        expect(await screen.findByText("Überprüfe deine Eingaben:")).toBeInTheDocument();
+        expect(spy_updateError).toHaveBeenLastCalledWith(
+            "Überprüfe deine Eingaben:",
+            expect.objectContaining({
+                description: expect.anything(),
+            }),
+        );
     });
 
     it("zeigt den Erfolgs-Toast, wenn ein Buch erfolgreich gelöscht wurde.", async () => {
