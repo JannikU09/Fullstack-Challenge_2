@@ -87,7 +87,7 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                     toast.success(result.message, { description: `${date}, ${time} Uhr` });
                                  } else {
                                     toast.error(result.error, { description: `${date}, ${time} Uhr` });
-                                 }
+                                 };
                               }}
                               ariaLabel="Delete"
                            >
@@ -108,13 +108,29 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                                     authors={authors}
                                     onSubmit={async (_e, data) => {
                                        const id = book.Books.id;
-                                       if (id === undefined) return;
+                                       if (id === undefined) return false;
                                        const result = await updateBookAction(id, data);
                                        if (result.success === true) {
                                           setOpenBookId(undefined);
                                           toast.success(result.message, { description: `${date}, ${time} Uhr` });
+                                          return true;
                                        } else {
-                                          toast.error(result.error, { description: `${date}, ${time} Uhr` });
+                                          toast.error("Überprüfe deine Eingaben:", {
+                                             description: (
+                                                <pre
+                                                   style={{
+                                                      margin: 0,
+                                                      whiteSpace: "pre-wrap",
+                                                      overflowWrap: "anywhere",
+                                                   }}
+                                                >
+                                                   {result.error}
+                                                   {"\n".repeat(2)}
+                                                   {`${date}, ${time} Uhr`}
+                                                </pre>
+                                             )
+                                          });
+                                          return false;
                                        }
                                     }}
                                     submitLabel="Update"
@@ -136,8 +152,24 @@ export const BookList = ({ books, authors, total }: BookListProps) => {
                   const result = await createBookAction(data);
                   if (result.success === true) {
                      toast.success(result.message, { description: `${date}, ${time} Uhr` });
+                     return true;
                   } else {
-                     toast.error(result.error, { description: `${date}, ${time} Uhr` });
+                     toast.error("Überprüfe deine Eingaben:", {
+                        description: (
+                           <pre
+                              style={{
+                                 margin: 0,
+                                 whiteSpace: "pre-wrap",
+                                 overflowWrap: "anywhere",
+                              }}
+                           >
+                              {result.error}
+                              {"\n".repeat(2)}
+                              {`${date}, ${time} Uhr`}
+                           </pre>
+                        ),
+                     });
+                     return false;
                   }
                }}
                submitLabel="Add"

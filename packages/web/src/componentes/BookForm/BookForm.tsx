@@ -17,6 +17,12 @@ export function BookForm({
   const [isbn, setIsbn] = useState(initialValues?.isbn ?? "");
   const [year, setYear] = useState(initialValues?.year ?? "");
 
+  const isValidTitle = title.trim() !== "";
+  const isValidAuthor = String(authorId) !== "";
+  const isValidIsbn = /^\d+$/.test(isbn);
+  const isValidIsbnLength = /^\d{13}$/.test(isbn);
+  const isValidYear = /^(\d{4})?$/.test(String(year));
+
   const handleEmptyFields = () => {
     if (!initialValues) {
       setTitle("");
@@ -35,10 +41,18 @@ export function BookForm({
           onChange={(event) => setTitle(event.target.value)}
           autoComplete="off"
           required
+          error={!isValidTitle}
         />
+        <p className="errorText" hidden={isValidTitle}>
+          Bitte einen Title eingeben.
+        </p>
         <div style={{ margin: "10px" }} />
 
-        <FormControl fullWidth required>
+        <FormControl
+          fullWidth
+          required
+          error={!isValidAuthor}
+        >
           <InputLabel>Author</InputLabel>
           <Select
             value={authorId}
@@ -53,6 +67,9 @@ export function BookForm({
             ))}
           </Select>
         </FormControl>
+        <p className="errorText" hidden={isValidAuthor}>
+          Bitte einen Author auswählen.
+        </p>
         <div style={{ margin: "10px" }} />
 
         <TextField
@@ -61,11 +78,15 @@ export function BookForm({
           onChange={(event) => setIsbn(event.target.value)}
           autoComplete="off"
           required
+          error={!isValidIsbn || !isValidIsbnLength}
         />
-        <p className="isbnHilfstext" hidden={isbn.length >= 13}>
-          Noch {13 - isbn.length} Zeichen
+        <p className="errorText" hidden={isValidIsbn}>
+          Nur Ziffern eingeben.
         </p>
-        <p className="isbnHilfstext" hidden={isbn.length <= 13}>
+        <p className="errorText" hidden={isbn.length >= 13}>
+          Noch {13 - isbn.length} Zeichen.
+        </p>
+        <p className="errorText" hidden={isbn.length <= 13}>
           {isbn.length - 13} Zeichen zu viel!
         </p>
         <div style={{ margin: "10px" }} />
@@ -74,8 +95,11 @@ export function BookForm({
           value={year}
           label="Year"
           onChange={(event) => setYear(event.target.value)}
-          autoComplete="off"
+          error={!isValidYear}
         />
+        <p className="errorText" hidden={isValidYear}>
+          Nur 4 Ziffern eingeben.
+        </p>
         <h6 style={{ color: "gray" }}>required *</h6>
         <div style={{ margin: "2.5px" }} />
 
@@ -83,7 +107,7 @@ export function BookForm({
           variant="primary"
           type="button"
           onClick={async (e) => {
-            await onSubmit?.(e, {
+            const isSuccess = await onSubmit?.(e, {
               Books: {
                 id: initialValues?.id,
                 title: title,
@@ -96,7 +120,9 @@ export function BookForm({
                 name: "",
               },
             });
-            handleEmptyFields();
+            if (isSuccess) {
+              handleEmptyFields();
+            }
           }}
         >
           <strong>{submitLabel}</strong>

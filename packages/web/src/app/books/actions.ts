@@ -9,10 +9,23 @@ import type { BookWithAuthor } from "../interfaces/BookWithAuthor";
 import type { BookSearchParams } from "../interfaces/searchParams";
 
 const schema = z.object({
-    title: z.string().min(1),
-    authorId: z.number().int().positive(),
-    isbn: z.string().min(13).max(13),
-    year: z.number().int().min(1000).max(9999).optional().nullish(),
+    title: z
+        .string()
+        .min(1, "Der Title darf nicht leer sein."),
+    authorId: z
+        .number()
+        .int()
+        .positive("Ein Author muss ausgewählt sein."),
+    isbn: z
+        .string()
+        .length(13, "Die ISBN muss 13 Zeichen lang sein."),
+    year: z
+        .number("Nur Ziffern eingeben.")
+        .int()
+        .min(1000, "Das Jahr muss >= 1000 sein.")
+        .max(9999, "Das Jahr muss <= 9999 sein.")
+        .optional()
+        .nullish(),
 });
 
 export async function getBooks(params: BookSearchParams) {
@@ -69,7 +82,8 @@ export async function createBookAction(bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
 
     if (!result.success) {
-        return { success: false, error: "Validation Error" };
+        const errorMessages = result.error.issues.map((issue) => `- ${issue.message}`).join("\n");
+        return { success: false, error: errorMessages };
     }
 
     try {
@@ -100,7 +114,8 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
     const result = schema.safeParse(bookInput.Books, { reportInput: true });
 
     if (!result.success) {
-        return { success: false, error: "Validation Error" };
+        const errorMessages = result.error.issues.map((issue) => `- ${issue.message}`).join("\n");
+        return { success: false, error: errorMessages };
     }
 
     try {

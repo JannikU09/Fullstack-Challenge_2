@@ -74,7 +74,7 @@ describe("BookForm", () => {
 
     it("ruft onSubmit ohne initialValues auf.", async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn().mockResolvedValue(true);
         render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Add" />);
 
         await user.type(screen.getByRole("textbox", { name: /title/i }), "Harry");
@@ -95,7 +95,7 @@ describe("BookForm", () => {
 
     it("ruft onSubmit mit initialValues auf.", async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn().mockResolvedValue(true);
         render(<BookForm authors={authorTestList} onSubmit={onSubmit} submitLabel="Update" initialValues={initialValuess} />);
 
 
@@ -134,7 +134,7 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "123456789012");
 
-        expect(screen.getByText("Noch 1 Zeichen")).toBeVisible();
+        expect(screen.getByText("Noch 1 Zeichen.")).toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 
@@ -145,7 +145,7 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "1234567890123");
 
-        expect(screen.getByText(/^Noch \d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText(/^Noch \d+ Zeichen.$/)).not.toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 
@@ -156,14 +156,14 @@ describe("BookForm", () => {
         const isbnTextbox = screen.getByRole("textbox", { name: /isbn/i });
         await user.type(isbnTextbox, "12345678901234");
 
-        expect(screen.getByText(/^Noch -?\d+ Zeichen$/)).not.toBeVisible();
+        expect(screen.getByText(/^Noch -?\d+ Zeichen.$/)).not.toBeVisible();
         expect(screen.getByText("1 Zeichen zu viel!")).toBeVisible();
     });
 
     it("ISBN-Hilfstexte, 0 Zeichen eingetippt", async () => {
         renderBookForm();
 
-        expect(screen.getByText("Noch 13 Zeichen")).toBeVisible();
+        expect(screen.getByText("Noch 13 Zeichen.")).toBeVisible();
         expect(screen.getByText(/zu viel/i)).not.toBeVisible();
     });
 });
