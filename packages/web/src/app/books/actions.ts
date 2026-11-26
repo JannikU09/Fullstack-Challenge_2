@@ -104,8 +104,6 @@ export async function updateBookAction(id: number, bookInput: BookWithAuthor) {
     }
 
     try {
-
-
         const updated = await db.update(books).set(result.data).where(eq(books.id, id)).returning();
         if (updated.length === 0) {
             return { success: false, error: "Buch nicht gefunden." };
